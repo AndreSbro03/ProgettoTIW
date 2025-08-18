@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AsteMi</title>
+<link rel="stylesheet" href="css/general.css">
+<link rel="stylesheet" href="css/searchbar.css">
+<link rel="stylesheet" href="css/auctionlist.css">
+<link rel="stylesheet" href="css/auction-details.css">
+<link rel="stylesheet" href="css/cards.css">
+<script src="widget/countDown.js" charset="utf-8" defer></script>
+<script src="widget/itemsGrid.js" charset="utf-8" defer></script>
+<script src="widget/auctionList.js" charset="utf-8" defer></script>
+<script src="utils.js" charset="utf-8" defer></script>
+<script src="buy.js" charset="utf-8" defer></script>
+<script src="auctionDetails.js" charset="utf-8" defer></script>
+<script src="pageOrchestrator.js" charset="utf-8" defer></script>
+</head>
+<body class="body">
+
+	<div class="padding">
+		<div class="centered">
+			<h2 id="title" class="title"></h2>
+		</div>
+	</div>
+
+	<div id="title"></div>
+	<div id="buy-page">
+		<!-- Search Bar TODO: test force show and search -->
+		<form action="search-auctions" method="POST" class="search-bar">
+			<input type="text" name="key-word" placeholder="Search..."
+				class="search-input">
+			<button type="submit" class="search-button">
+				<img class="small-icon"
+					src="https://img.icons8.com/?size=100&id=132&format=png&color=000000"
+					alt="Search">
+			</button>
+		</form>
+		<!-- Result number -->
+		<div class="centered">
+			<div class="padding">
+				<p id="auction-number" class="light-text">No results found</p>
+			</div>
+		</div>
+	</div>
+	<div id="sell-page"></div>
+	<div id="auction-details-page">
+		<!-- Header -->
+		<div id="auction-data" class="auction-container">
+			<div class="item-container">
+				<div class="padding">
+					<!-- Header -->
+					<div class="auction-header">
+						<div class="h-padding">
+							<h2 id="auction-owner"></h2>
+							<p id="auction-min-incr"></p>
+						</div>
+						<div class="h-padding">
+							<p>Starting from:</p>
+							<h2 id="auction-init-price"></h2>
+						</div>
+						<div id="auction-expiration" class="h-padding"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Offers -->
+		<div class="auction-main padding">
+			<!-- Left column -->
+			<div class="left-column">
+				<!-- Best Offer -->
+				<div id="auction-best-offer" class="best-offer"></div>
+				<div id="auction-state-option"></div>
+			</div>
+			<!-- Offers List (Right Column) -->
+			<div class="offers" style="color: white">
+				<div class="padding">
+					<h3>OFFERS</h3>
+					<div id="auction-offers-list" class="offers-list"></div>
+				</div>
+			</div>
+		</div>
+		<!-- All the items -->
+		<div class="centered padding">
+			<p id="auction-items-number" class="light-text"></p>
+		</div>
+		<div class="padding">
+			<div id="auction-items" class="product-grid"></div>
+		</div>
+	</div>
+</body>
+<script>
+	
+</script>
+</html>
