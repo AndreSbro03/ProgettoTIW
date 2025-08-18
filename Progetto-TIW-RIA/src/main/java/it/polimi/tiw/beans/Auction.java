@@ -5,6 +5,9 @@ import java.util.ArrayList;
 
 import it.polimi.tiw.generals.AuctionState;
 
+/**
+ * Auction Bean
+ */
 public class Auction {
 	private int id = 0;
 	private AuctionState state;
