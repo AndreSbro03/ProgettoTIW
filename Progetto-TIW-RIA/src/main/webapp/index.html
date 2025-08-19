@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>LogIn</title>
 <link rel="stylesheet" href="css/general.css">
+<script src="widget/errorMessage.js" charset="uft-8" defer></script>
 <script src="utils.js" charset="utf-8" defer></script>
 <script src="loginManager.js" charset="utf-8" defer></script>
 </head>
@@ -21,14 +22,17 @@
 		</div>
 	</div>
 
+	<div id="error-box"></div>
+
 	<div class="padding">
 		<form class="form" action="#">
 			<label class="form-label" for="username">Username</label> <input
 				class="digit-input" type="text" name="username"
 				placeholder="Username" required> <label class="form-label"
 				for="password">Password</label> <input class="digit-input"
-				type="password" name="password" placeholder="Password" required> <input
-				class="submit-input" type="submit" value="LogIn" id="login-button">
+				type="password" name="password" placeholder="Password" required>
+			<input class="submit-input" type="submit" value="LogIn"
+				id="login-button">
 		</form>
 	</div>
 

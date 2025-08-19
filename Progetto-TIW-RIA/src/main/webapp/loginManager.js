@@ -11,7 +11,7 @@
 		var form = e.target.closest("form");
 		if (form.checkValidity()) {
 			console.log("HEY");
-			makeCall("POST", 'login', e.target.closest("form"),
+			makeCall("POST", 'login', form,
 				function(x) {
 					if (x.readyState == XMLHttpRequest.DONE) {
 						var message = x.responseText;
@@ -21,14 +21,9 @@
 								window.location.href = "astemi.html";
 								break;
 							case 400: // bad request
-								console.log(message);
-								document.getElementById("errormessage").textContent = message;
-								break;
 							case 401: // unauthorized
-								document.getElementById("errormessage").textContent = message;
-								break;
 							case 500: // server error
-								document.getElementById("errormessage").textContent = message;
+								errorMessageBanner.show(message);
 								break;
 						}
 					}

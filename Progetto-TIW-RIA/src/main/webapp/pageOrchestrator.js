@@ -4,6 +4,13 @@ var pageOrchestrator;
 	let buy, auctionDetails, _pageOrchestrator = new PageOrchestrator();
 
 	window.addEventListener("load", () => {
+		// Link the buttons with their functions
+		window.addEventListener("load", () => {
+			
+			errorMessageBanner.start();
+		}, false);
+
+		
 		// Set the pageOrchestrator as global
 		pageOrchestrator = _pageOrchestrator;
 		pageOrchestrator.start();
@@ -43,8 +50,13 @@ var pageOrchestrator;
 		}
 
 		this.refresh = function() {
-			buy.show();
-			auctionDetails.hide();
+			/**
+			 * Load from localStorage the last page visited
+			 */
+			page = "BUY";
+			
+			this.reset();
+			this.show(page);
 		}
 
 		/**
@@ -53,6 +65,7 @@ var pageOrchestrator;
 		this.reset = function() {
 			this.title.innerHTML = "";
 			buy.hide();
+			auctionDetails.hide();
 		}
 
 		this.seeAuctionDetails = function(id) {
@@ -60,6 +73,21 @@ var pageOrchestrator;
 			auctionDetails.show(id);
 
 		}
+		
+		this.show = function(page){
+			this.reset();
+			
+			switch (page){
+				case "BUY":
+					buy.show();
+					break;
+				case "SELL":
+					sell.show();
+					break;
+			}
+		}
+		
+		
 	}
 
 }

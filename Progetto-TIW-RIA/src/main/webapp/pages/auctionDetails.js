@@ -106,7 +106,7 @@
 			 * Items grid
 			 */
 			self.itemsNumberNode.textContent = "There are " + auction.items.length + " items in this auction";
-			new ItemGrid(items, self.itemsNode).show();
+			new ItemsGrid(items, self.itemsNode).show();
 
 		}
 		

@@ -1,14 +1,15 @@
 package it.polimi.tiw.servlets.user;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.*;
+
 
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.UserDataDAO;
@@ -18,6 +19,7 @@ import it.polimi.tiw.generals.AuctionUtils;
  * Servlet implementation class LogIn
  */
 @WebServlet("/login")
+@MultipartConfig
 public class LogIn extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -34,14 +36,11 @@ public class LogIn extends HttpServlet {
 		 */
 		String username = req.getParameter("username");
 		String password = req.getParameter("password");
-		
-		System.out.println(username);
-		System.out.println(password);
 
 		/**
 		 * Check that they are both not null
 		 */
-		if (username == null || password == null) {
+		if (username == null || password == null || username.isEmpty() || password.isEmpty() ) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			res.getWriter().println("Fill all fields");
 			return;
