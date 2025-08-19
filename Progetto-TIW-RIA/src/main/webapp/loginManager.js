@@ -6,6 +6,8 @@
  * Login management
  */
 (function() { // avoid variables ending up in the global scope
+	
+	if(sessionStorage.getItem("username")) window.location.href = "astemi.html";
 
 	document.getElementById("login-button").addEventListener('click', (e) => {
 		var form = e.target.closest("form");

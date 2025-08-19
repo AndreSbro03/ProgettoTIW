@@ -31,11 +31,12 @@ var pageOrchestrator;
 		this.alert = null;
 
 		this.start = function() {
-			buy = new Buy(
-				this.title,
-				this.alert,
-				document.getElementById("buy-page"),
-				document.getElementById("auction-number")
+			buy = new Buy({
+				title: this.title,
+				starting: document.getElementById("buy-page"),
+				aNumber: document.getElementById("auction-number"),
+				auctions: document.getElementById("buy-auctions")
+			}
 			);
 
 			sell = new Sell({

@@ -8,7 +8,7 @@
 			const diff = this.targetDate - now;
 
 			if (diff <= 0) {
-				this.node.textContent = "Ended on the: " + prettyDate(this.targetDate);
+				this.node.textContent = "Expired: " + prettyDate(this.targetDate);
 				clearInterval(this.timerInterval);
 				return;
 			}

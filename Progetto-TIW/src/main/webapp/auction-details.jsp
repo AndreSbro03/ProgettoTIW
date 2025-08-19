@@ -135,7 +135,7 @@
 												<!-- Auction is open (You can put an offer) -->
 												<div class="place-offer">
 													<form class="form" action="confirm-offer" method="POST">
-														<label class="form-label" for="name">Place Offer</label> <input
+														<label class="form-label">Place Offer</label> <input
 															class="digit-input" type="number" name="import"
 															placeholder="Import"> <input type="hidden"
 															name="auctionId" value="${auction.id}"> <input

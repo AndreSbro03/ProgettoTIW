@@ -2,11 +2,11 @@
  * Buy page viwer
  */
 {
-	function Buy(_title, _alert, _startingNode, _numberNode) {
-		this.alert = _alert;
-		this.title = _title;
-		this.startingNode = _startingNode;
-		this.numberNode = _numberNode;
+	function Buy(nodes) {
+		this.title = nodes['title'];
+		this.startingNode = nodes["starting"];
+		this.numberNode = nodes["aNumber"];
+		this.auctionsNode = nodes["auctions"];
 
 		this.show = function() {
 			makeCall("GET", "get-auctions", null, (req) => {
@@ -37,16 +37,17 @@
 			 */
 			self.numberNode.textContent = "Number of results: " + auctions.length;
 			
+			/**
+			 * AuctionList
+			 */
 			if(auctions.lenght !== 0) {
-				/**
-				 * AuctionList
-				 */
-				var op = document.createElement("div");
-				op.className = "auctions-shower";
-				new AuctionList(auctions, op).show();
-				self.startingNode.appendChild(op);
+				new AuctionList(auctions, self.auctionsNode).show();
 			}
 
+		}
+		
+		this.reset = function() {
+			this.auctionsNode.innerHTML = "";
 		}
 		
 		this.hide = function() {
