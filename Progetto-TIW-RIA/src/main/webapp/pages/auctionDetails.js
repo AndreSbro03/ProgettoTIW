@@ -117,7 +117,7 @@
 						submit.type = "submit";
 						submit.value = "Close Auction";
 						/**
-						 * TODO: POST method
+						 * TODO: POST method to close
 						 */
 					}
 				} else {
@@ -137,17 +137,44 @@
 						price.name = "import";
 						submit.type = "submit";
 						submit.value = "Offer";
+						/**
+						 * POST method to send new offer
+						 */
+						submit.addEventListener('click', (e) => {
+							var form = e.target.closest("form");
+							if (form.checkValidity()) {
+								makeCall("POST", 'confirm-offer', form,
+									function(x) {
+										if (x.readyState == XMLHttpRequest.DONE) {
+											var message = x.responseText;
+											switch (x.status) {
+												case 200:
+													// Reload this page
+													pageOrchestrator.seeAuctionDetails(auction.id);
+													return;
+												case 400: // bad request
+												case 401: // unauthorized
+												case 500: // server error
+													errorMessageBanner.show(message);
+													break;
+											}
+										}
+									}
+								);
+							} else {
+								form.reportValidity();
+							}
+						});
 					}
+
+					/**
+					 * Items grid
+					 */
+					self.itemsNumberNode.textContent = "There are " + auction.items.length + " items in this auction";
+					new ItemsGrid(auction.items, self.itemsNode).show();
+
 				}
-
 			}
-
-			/**
-			 * Items grid
-			 */
-			self.itemsNumberNode.textContent = "There are " + auction.items.length + " items in this auction";
-			new ItemsGrid(auction.items, self.itemsNode).show();
-
 		}
 
 		this.constructOffer = function(offer) {
@@ -169,7 +196,5 @@
 		this.hide = function() {
 			this.startingNode.style.display = "none";
 		}
-
 	}
-
 }
