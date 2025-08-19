@@ -1,7 +1,7 @@
 var pageOrchestrator;
 {
 
-	let buy, sell, auctionDetails, _pageOrchestrator = new PageOrchestrator();
+	let buy, sell, auctionDetails, itemForm, _pageOrchestrator = new PageOrchestrator();
 
 	window.addEventListener("load", () => {
 
@@ -15,10 +15,12 @@ var pageOrchestrator;
 
 		// Set the pageOrchestrator as global
 		pageOrchestrator = _pageOrchestrator;
-		// Link the buttons with their functions
 		
+		// Link the buttons with their functions
 		document.getElementById("sell-btn").addEventListener("click", () => pageOrchestrator.show("SELL"));
 		document.getElementById("buy-btn").addEventListener("click", () => pageOrchestrator.show("BUY"));
+		document.getElementById("add-item-btn").addEventListener("click", () => pageOrchestrator.show("ITEM-FORM"));
+		document.getElementById("add-auction-btn").addEventListener("click", () => pageOrchestrator.show("AUCTION-FORM"));
 		
 		pageOrchestrator.start();
 		pageOrchestrator.refresh();
@@ -54,7 +56,6 @@ var pageOrchestrator;
 
 			auctionDetails = new AuctionDetails({
 				title: this.title,
-				alert: this.alert,
 				starting: document.getElementById("auction-details-page"),
 				data: document.getElementById("auction-data"),
 				owner: document.getElementById("auction-owner"),
@@ -67,6 +68,12 @@ var pageOrchestrator;
 				itemsNumber: document.getElementById("auction-items-number"),
 				items: document.getElementById("auction-items")
 			});
+			
+			itemForm = new ItemForm({
+				title: this.title,
+				starting: document.getElementById("add-item-form"),
+				submit: document.getElementById("item-form-submit")
+			})
 
 		}
 
@@ -86,6 +93,7 @@ var pageOrchestrator;
 			buy.hide();
 			auctionDetails.hide();
 			sell.hide();
+			itemForm.hide();
 		}
 
 		this.seeAuctionDetails = function(id) {
@@ -105,6 +113,9 @@ var pageOrchestrator;
 					break;
 				case "SELL":
 					sell.show();
+					break;
+				case "ITEM-FORM":
+					itemForm.show();
 					break;
 			}
 		}

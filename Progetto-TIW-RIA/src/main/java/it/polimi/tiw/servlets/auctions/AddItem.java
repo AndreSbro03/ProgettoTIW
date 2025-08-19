@@ -1,0 +1,113 @@
+package it.polimi.tiw.servlets.auctions;
+
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+import java.io.IOException;
+import java.sql.*;
+
+import it.polimi.tiw.beans.Item;
+import it.polimi.tiw.beans.User;
+import it.polimi.tiw.dao.ItemDAO;
+import it.polimi.tiw.generals.AuctionUtils;
+import it.polimi.tiw.servlets.ItemImage;
+
+/**
+ * Servlet implementation class AddItem
+ */
+@WebServlet("/add-item")
+@MultipartConfig
+public class AddItem extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	Connection connection;
+
+	public void init() throws ServletException {
+		connection = AuctionUtils.openDbConnection(getServletContext());
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		/**
+		 * First check if there is an user logged in. If not redirect to the login page.
+		 */
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("You must be logged");
+			return;
+		}
+
+		/**
+		 * Get all the parameters passed in the form
+		 */
+		String name = request.getParameter("name");
+		String descr = request.getParameter("description");
+		Part imagePart = request.getPart("image");
+		String price = request.getParameter("price");
+
+		/**
+		 * Create the item so that the constructor can check the validity of the fields
+		 */
+		float fprice = 0.f;
+		try {
+			fprice = Item.isValid(name, descr, price);
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Incorrect param values");
+			return;
+		}
+
+		// We first check the parameter needed is present
+		if (imagePart == null || imagePart.getSize() <= 0) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Image not valid");
+			return;
+		}
+
+		// We then check the parameter is valid (in this case right format)
+		String contentType = imagePart.getContentType();
+
+		if (!contentType.startsWith("image")) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Image not valid");
+			return;
+		}
+
+		/**
+		 * Insert the item into the db
+		 */
+		ItemDAO idao = new ItemDAO(connection);
+		int itemId = 0;
+		/*
+		 * TODO: rollback se il salvataggio dell'immagine va male
+		 */
+		try {
+			itemId = idao.addItem(user.getId(), name, descr, fprice);
+			/**
+			 * Save the image passed with the id assigned
+			 */
+			ItemImage.saveImage(getServletContext(), imagePart, itemId);
+		} catch (SQLException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Server error");
+			return;
+		}
+
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.getWriter().println("Item added correctly");
+	}
+
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
+	}
+
+}

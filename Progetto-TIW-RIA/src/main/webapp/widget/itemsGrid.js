@@ -8,6 +8,7 @@
 
 		this.show = function() {
 			var self = this;
+			this.reset;
 			self.items.forEach((item) => {
 				var ip = self.startingNode;
 				ip = addNode(ip, "div", "product-card");
@@ -17,8 +18,12 @@
 				ip = addNode(ip, "div", "padding");
 				addNode(ip, "h2", "product-name", item.name);
 				addNode(ip, "p", "product-description", item.descr);
-				addNode(ip, "p", "product-description", item.price);
+				addNode(ip, "p", "product-description", item.price + "€");
 			});
+		}
+		
+		this.reset = function() {
+			this.startingNode.innerHTML = "";
 		}
 
 	}

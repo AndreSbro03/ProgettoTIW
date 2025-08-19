@@ -4,7 +4,6 @@
 
 {
 	function AuctionDetails(nodes) {
-		this.alert = nodes['alert'];
 		this.title = nodes['title'];
 		this.startingNode = nodes['starting'];
 		this.dataNode = nodes['data'];
@@ -167,13 +166,13 @@
 						});
 					}
 
-					/**
-					 * Items grid
-					 */
-					self.itemsNumberNode.textContent = "There are " + auction.items.length + " items in this auction";
-					new ItemsGrid(auction.items, self.itemsNode).show();
 
 				}
+				/**
+				 * Items grid
+				 */
+				self.itemsNumberNode.textContent = "There are " + auction.items.length + " items in this auction";
+				new ItemsGrid(auction.items, self.itemsNode).show();
 			}
 		}
 
