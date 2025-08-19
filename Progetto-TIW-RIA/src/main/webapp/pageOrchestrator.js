@@ -1,18 +1,25 @@
 var pageOrchestrator;
 {
 
-	let buy, auctionDetails, _pageOrchestrator = new PageOrchestrator();
+	let buy, sell, auctionDetails, _pageOrchestrator = new PageOrchestrator();
 
 	window.addEventListener("load", () => {
-		// Link the buttons with their functions
-		window.addEventListener("load", () => {
-			
-			errorMessageBanner.start();
-		}, false);
 
+		var username = sessionStorage.getItem("username");
+		if (username == null) {
+			window.location.href = "index.html";
+			return;
+		}
 		
+		console.log("Welcome back: " + username);
+
 		// Set the pageOrchestrator as global
 		pageOrchestrator = _pageOrchestrator;
+		// Link the buttons with their functions
+		
+		document.getElementById("sell-btn").addEventListener("click", () => pageOrchestrator.show("SELL"));
+		document.getElementById("buy-btn").addEventListener("click", () => pageOrchestrator.show("BUY"));
+		
 		pageOrchestrator.start();
 		pageOrchestrator.refresh();
 
@@ -29,7 +36,20 @@ var pageOrchestrator;
 				this.alert,
 				document.getElementById("buy-page"),
 				document.getElementById("auction-number")
-			)
+			);
+
+			sell = new Sell({
+				title: this.title,
+				starting: document.getElementById("sell-page"),
+				greetings: document.getElementById("sell-greetings"),
+				closedAuctions: document.getElementById("closed-auctions"),
+				caNumber: document.getElementById("closed-auctions-number"),
+				openAuctions: document.getElementById("open-auctions"),
+				oaNumber: document.getElementById("open-auctions-number"),
+				itemsGrid: document.getElementById("sell-items-grid"),
+				iNumber: document.getElementById("sell-items-number")
+			}
+			);
 
 			auctionDetails = new AuctionDetails({
 				title: this.title,
@@ -54,8 +74,6 @@ var pageOrchestrator;
 			 * Load from localStorage the last page visited
 			 */
 			page = "BUY";
-			
-			this.reset();
 			this.show(page);
 		}
 
@@ -66,6 +84,7 @@ var pageOrchestrator;
 			this.title.innerHTML = "";
 			buy.hide();
 			auctionDetails.hide();
+			sell.hide();
 		}
 
 		this.seeAuctionDetails = function(id) {
@@ -73,11 +92,13 @@ var pageOrchestrator;
 			auctionDetails.show(id);
 
 		}
-		
-		this.show = function(page){
+
+		this.show = function(page) {
+			console.log("Resquest to show: " + page);
+			window.scrollTo(0, 0);
 			this.reset();
-			
-			switch (page){
+
+			switch (page) {
 				case "BUY":
 					buy.show();
 					break;
@@ -86,8 +107,8 @@ var pageOrchestrator;
 					break;
 			}
 		}
-		
-		
+
+
 	}
 
 }

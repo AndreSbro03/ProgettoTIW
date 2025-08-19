@@ -10,7 +10,6 @@
 	document.getElementById("login-button").addEventListener('click', (e) => {
 		var form = e.target.closest("form");
 		if (form.checkValidity()) {
-			console.log("HEY");
 			makeCall("POST", 'login', form,
 				function(x) {
 					if (x.readyState == XMLHttpRequest.DONE) {

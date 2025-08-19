@@ -71,7 +71,7 @@ public class LogIn extends HttpServlet {
 			res.setStatus(HttpServletResponse.SC_OK);
 			res.setContentType("application/json");
 			res.setCharacterEncoding("UTF-8");
-			res.getWriter().println(user);
+			res.getWriter().println(user.getUsername());
 		}
 
 	}

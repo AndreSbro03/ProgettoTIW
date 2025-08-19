@@ -14,12 +14,7 @@
 					var message = req.responseText;
 					if (req.status == 200) {
 						var auctions = JSON.parse(req.responseText);
-						if (auctions.length == 0) {
-							self.alert.textContent = "No auctions yet!";
-							return;
-						}
 						this.update(auctions);
-
 					} else if (req.status == 403) {
 						//TODO
 					}
@@ -32,13 +27,11 @@
 
 		this.update = function(auctions) {
 			const self = this;
-			console.log(auctions);
-
+			this.startingNode.style.display = "block";
 			/**
 			 * Title
 			 */
 			self.title.textContent = "Buy";
-			
 			/**
 			 * Auction number
 			 */
@@ -57,8 +50,7 @@
 		}
 		
 		this.hide = function() {
-			var self = this;
-			self.startingNode.style.display = "none";
+			this.startingNode.style.display = "none";
 		}
 	}
 }

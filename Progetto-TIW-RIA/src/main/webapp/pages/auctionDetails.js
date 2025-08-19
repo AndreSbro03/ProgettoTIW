@@ -39,6 +39,7 @@
 
 		this.update = function(auction) {
 			var self = this;
+			this.reset();
 
 			/**
 			 * Set title
@@ -106,7 +107,7 @@
 			 * Items grid
 			 */
 			self.itemsNumberNode.textContent = "There are " + auction.items.length + " items in this auction";
-			new ItemsGrid(items, self.itemsNode).show();
+			new ItemsGrid(auction.items, self.itemsNode).show();
 
 		}
 		
@@ -116,6 +117,13 @@
 			addNode(obj, "span", "", offer.username);
 			addNode(obj, "span", "", prettyDate(offer.dateTime));
 			addNode(obj, "span", "", offer.price + "€");
+		}
+		
+		this.reset = function(){
+			this.stateOptionNode.innerHTML = "";
+			this.bestOfferNode.innerHTML = "";
+			this.offersNode.innerHTML = "";
+			this.expirationNode.innerHTML = "";
 		}
 		
 		this.hide = function(){

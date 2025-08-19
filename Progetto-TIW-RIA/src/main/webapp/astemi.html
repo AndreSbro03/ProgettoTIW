@@ -14,6 +14,7 @@
 <script src="widget/auctionList.js" charset="utf-8" defer></script>
 <script src="widget/errorMessage.js" charset="utf-8" defer></script>
 <script src="pages/buy.js" charset="utf-8" defer></script>
+<script src="pages/sell.js" charset="utf-8" defer></script>
 <script src="pages/auctionDetails.js" charset="utf-8" defer></script>
 <script src="pageOrchestrator.js" charset="utf-8" defer></script>
 </head>
@@ -27,13 +28,13 @@
 
 	<div class="absolute-top-left">
 		<div class="padding">
-			<a href="buy" class="btn">Buy</a>
+			<a id="buy-btn" class="btn">Buy</a>
 		</div>
 	</div>
 
 	<div class="absolute-top-right">
 		<div class="padding">
-			<a href="sell" class="btn">Sell</a>
+			<a id="sell-btn" class="btn">Sell</a>
 		</div>
 	</div>
 
@@ -58,7 +59,44 @@
 			</div>
 		</div>
 	</div>
-	<div id="sell-page"></div>
+	<div id="sell-page">
+		<div class="centered">
+			<div class="padding">
+				<h2 id="sell-greetings" class="light-text"></h2>
+			</div>
+		</div>
+		<div class="centered">
+			<div class="padding">
+				<a href="#" class="btn">Add item</a>
+			</div>
+			<div class="padding">
+				<a href="#" class="btn">Create auction</a>
+			</div>
+		</div>
+
+		<div class="centered">
+			<div class="padding">
+				<p id="open-auctions-number" class="light-text"></p>
+			</div>
+		</div>
+		<div id="open-auctions" class="auctions-shower"></div>
+
+		<div class="centered">
+			<div class="padding">
+				<p id="closed-auctions-number" class="light-text"></p>
+			</div>
+		</div>
+		<div id="closed-auctions" class="auctions-shower"></div>
+
+		<div class="centered">
+			<div class="padding">
+				<p id="sell-items-number" class="light-text"></p>
+			</div>
+		</div>
+		<div id="sell-items-grid"></div>
+
+
+	</div>
 	<div id="auction-details-page">
 		<!-- Header -->
 		<div id="auction-data" class="auction-container">
