@@ -1,9 +1,6 @@
 package it.polimi.tiw.servlets.auctions;
 
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.UnavailableException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,24 +9,25 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.beans.Item;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.UserDataDAO;
 import it.polimi.tiw.generals.AuctionUtils;
+import it.polimi.tiw.generals.LocalDateTimeAdapter;
 
 /**
  * Servlet implementation class CreateAuction
  */
-@WebServlet("/create-auction")
-public class CreateAuction extends HttpServlet {
+@WebServlet("/get-free-items")
+public class GetFreeItems extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private final String formPath = "create-auction.jsp";
 	Connection connection;
 
 	public void init() throws ServletException {
@@ -44,7 +42,8 @@ public class CreateAuction extends HttpServlet {
 		HttpSession session = req.getSession();
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
-			res.sendRedirect("login.jsp");
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			res.getWriter().println("You must be logged");
 			return;
 		}
 
@@ -56,22 +55,22 @@ public class CreateAuction extends HttpServlet {
 		try {
 			items = udd.getUserItems(user.getId(), true);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
+			return;
 		}
 		
 		/**
 		 * Pass all the items to the sell-list page
 		 */
-		res.setContentType("text/plain");
-		req.setAttribute("items", items);
-		RequestDispatcher dispatcher = req.getRequestDispatcher(formPath);
-		dispatcher.forward(req, res);
+		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
+		String json = gson.toJson(items);
+		
+		res.setContentType("application/json");
+		res.setCharacterEncoding("UTF-8");
+		res.getWriter().write(json);
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-	
 	public void destroy() {
 		try {
 			if (connection != null) {

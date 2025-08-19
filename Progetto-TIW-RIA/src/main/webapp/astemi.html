@@ -16,6 +16,7 @@
 <script src="pages/buy.js" charset="utf-8" defer></script>
 <script src="pages/sell.js" charset="utf-8" defer></script>
 <script src="pages/itemForm.js" charset="utf-8" defer></script>
+<script src="pages/auctionForm.js" charset="utf-8" defer></script>
 <script src="pages/auctionDetails.js" charset="utf-8" defer></script>
 <script src="pageOrchestrator.js" charset="utf-8" defer></script>
 </head>
@@ -46,7 +47,7 @@
 		<form action="search-auctions" method="POST" class="search-bar">
 			<input type="text" name="key-word" placeholder="Search..."
 				class="search-input">
-			<button type="submit" class="search-button">
+			<button type="button" class="search-button">
 				<img class="small-icon"
 					src="https://img.icons8.com/?size=100&id=132&format=png&color=000000"
 					alt="Search">
@@ -95,7 +96,7 @@
 				<p id="sell-items-number" class="light-text"></p>
 			</div>
 		</div>
-		<div class="centered">
+		<div class="padding">
 			<div id="sell-items-grid" class="product-grid"></div>
 		</div>
 
@@ -159,8 +160,26 @@
 					name="image" accept="image/*"> <label class="form-label"
 					for="price">Price</label> <input class="digit-input" type="number"
 					name="price" placeholder="Price"> <input
-					id="item-form-submit" class="submit-input" type="submit"
+					id="item-form-submit" class="submit-input" type="button"
 					value="Add">
+			</form>
+		</div>
+	</div>
+
+	<div id="create-auction-form">
+		<div class="padding">
+			<form class="form" action="#">
+				<label class="form-label">Select Items</label>
+				<div id="form-free-items" class="checkbox-grid"></div>
+
+				<label class="form-label" for="min_incr">Minimum offer
+					increment</label> <input class="digit-input" type="number" name="min_incr"
+					placeholder="Minimum offer increment"> <label
+					class="form-label" for="expiration">Expiration</label> <input
+					class="digit-input" type="date" name="date" placeholder="Date">
+				<input class="digit-input" type="time" name="time"
+					placeholder="Time"> <input id="auction-form-submit"
+					class="submit-input" type="button" value="Add">
 			</form>
 		</div>
 	</div>

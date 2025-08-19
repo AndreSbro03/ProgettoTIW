@@ -1,7 +1,7 @@
 var pageOrchestrator;
 {
 
-	let buy, sell, auctionDetails, itemForm, _pageOrchestrator = new PageOrchestrator();
+	let buy, sell, auctionDetails, itemForm, auctionForm, _pageOrchestrator = new PageOrchestrator();
 
 	window.addEventListener("load", () => {
 
@@ -10,18 +10,18 @@ var pageOrchestrator;
 			window.location.href = "index.html";
 			return;
 		}
-		
+
 		console.log("Welcome back: " + username);
 
 		// Set the pageOrchestrator as global
 		pageOrchestrator = _pageOrchestrator;
-		
+
 		// Link the buttons with their functions
 		document.getElementById("sell-btn").addEventListener("click", () => pageOrchestrator.show("SELL"));
 		document.getElementById("buy-btn").addEventListener("click", () => pageOrchestrator.show("BUY"));
 		document.getElementById("add-item-btn").addEventListener("click", () => pageOrchestrator.show("ITEM-FORM"));
 		document.getElementById("add-auction-btn").addEventListener("click", () => pageOrchestrator.show("AUCTION-FORM"));
-		
+
 		pageOrchestrator.start();
 		pageOrchestrator.refresh();
 
@@ -68,12 +68,19 @@ var pageOrchestrator;
 				itemsNumber: document.getElementById("auction-items-number"),
 				items: document.getElementById("auction-items")
 			});
-			
+
 			itemForm = new ItemForm({
 				title: this.title,
 				starting: document.getElementById("add-item-form"),
 				submit: document.getElementById("item-form-submit")
 			})
+
+			auctionForm = new AuctionForm({
+				title: this.title,
+				starting: document.getElementById("create-auction-form"),
+				submit: document.getElementById("auction-form-submit"),
+				items: document.getElementById("form-free-items")
+			});
 
 		}
 
@@ -94,6 +101,7 @@ var pageOrchestrator;
 			auctionDetails.hide();
 			sell.hide();
 			itemForm.hide();
+			auctionForm.hide();
 		}
 
 		this.seeAuctionDetails = function(id) {
@@ -116,6 +124,9 @@ var pageOrchestrator;
 					break;
 				case "ITEM-FORM":
 					itemForm.show();
+					break;
+				case "AUCTION-FORM":
+					auctionForm.show();
 					break;
 			}
 		}

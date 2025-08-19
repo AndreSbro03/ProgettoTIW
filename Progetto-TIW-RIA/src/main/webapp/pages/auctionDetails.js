@@ -134,7 +134,7 @@
 						hidden.value = auction.id;
 						price.type = "number";
 						price.name = "import";
-						submit.type = "submit";
+						submit.type = "button";
 						submit.value = "Offer";
 						/**
 						 * POST method to send new offer

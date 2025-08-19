@@ -42,6 +42,7 @@
 		}
 		
 		this.update = function(closed, open, items) {
+			this.reset();
 			this.startingNode.style.display = "block";
 			this.title.innerText = "Sell";
 			this.greetings.innerText = "Welcome back " + sessionStorage.getItem("username");
@@ -56,6 +57,12 @@
 		this.hide = function() {
 			console.log("hiding");
 			this.startingNode.style.display = "none";
+		}
+		
+		this.reset = function(){
+			this.closedAuctions.innerHTML = "";
+			this.openAuctions.innerHTML = "";
+			this.itemsGrid.innerHTML = "";
 		}
 	}
 }

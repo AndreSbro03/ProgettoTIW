@@ -8,6 +8,7 @@
 		this.submitButton = nodes["submit"];
 
 		this.show = function() {
+			this.startingNode.style.display = "block";
 			/**
 			 * No server request needed
 			 */
@@ -17,7 +18,6 @@
 
 		this.update = function() {
 			this.reset();
-			this.startingNode.style.display = "block";
 			this.title.innerText = "Add Item";
 			this.submitButton.addEventListener('click', (e) => {
 				var form = e.target.closest("form");

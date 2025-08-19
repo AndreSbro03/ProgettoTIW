@@ -45,7 +45,7 @@ public class UserDataDAO {
 	}
 
 	/**
-	 * Return all the items that a user have loaded.
+	 * Return all the items that a user have loaded, if nothing is found return an empty list.
 	 * 
 	 * @param freeFromAuction if {@code true} only the items not in a auction will
 	 *                        be returned.

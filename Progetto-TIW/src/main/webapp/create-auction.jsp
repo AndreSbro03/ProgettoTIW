@@ -26,8 +26,7 @@
 			<div class="checkbox-grid">
 				<c:forEach var="item" items="${items}">
 					<label class="checkbox-item"> <input type="checkbox"
-						name="item_ids" value="${item.id}"
-						<c:if test="${fn:contains(selectedIdsString, item.id)}">checked</c:if> />
+						name="item_ids" value="${item.id}" />
 						<span class="checkbox-label"> <c:out value="${item.name}" />
 							— <c:out value="${item.price}" />€
 					</span>

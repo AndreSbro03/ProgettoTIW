@@ -1,11 +1,11 @@
 package it.polimi.tiw.servlets.auctions;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.*;
 import java.time.*;
 import java.time.format.DateTimeParseException;
@@ -18,6 +18,7 @@ import it.polimi.tiw.dao.UserDataDAO;
 import it.polimi.tiw.generals.AuctionUtils;
 
 @WebServlet("/confirm-auction")
+@MultipartConfig
 public class ConfirmAuction extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	Connection connection;
@@ -26,38 +27,34 @@ public class ConfirmAuction extends HttpServlet {
 		connection = AuctionUtils.openDbConnection(getServletContext());
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
-	private void sendErrorMessage(HttpServletRequest req, HttpServletResponse res, String msg) throws IOException {
-		 HttpSession session = req.getSession(true);
-		 session.setAttribute("errorMsg", msg); 
-		 res.sendRedirect("create-auction");
-	}
-
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		/**
-		 * Get the form parameters
-		 */
-		String[] ids = req.getParameterValues("item_ids");
-		String min_increment = req.getParameter("min_incr");
-		String date = req.getParameter("date");
-		String time = req.getParameter("time");
-
-		if (ids == null || min_increment == null || date == null || time == null) {
-			sendErrorMessage(req, res, "All fileds must be filled");
-			return;
-		}
-
 		/**
 		 * First check if there is an user logged in. If not redirect to the login page.
 		 */
 		HttpSession session = req.getSession();
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
-			res.sendRedirect("login.jsp");
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			res.getWriter().println("You must be logged");
+			return;
+		}
+
+		/**
+		 * Get the form parameters
+		 */
+		String[] ids = req.getParameterValues("items_ids");
+		String min_increment = req.getParameter("min_incr");
+		String date = req.getParameter("date");
+		String time = req.getParameter("time");
+		
+		System.out.println(ids);
+		System.out.println(min_increment);
+		System.out.println(date);
+		System.out.println(time);
+
+		if (ids == null || min_increment == null || date == null || time == null) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Fill all fields");
 			return;
 		}
 
@@ -68,19 +65,31 @@ public class ConfirmAuction extends HttpServlet {
 		 */
 		ArrayList<Integer> itemIds = new ArrayList<Integer>();
 		for (String id : ids) {
-			Integer itemId = Integer.parseInt(id);
+			Integer itemId;
+			try {
+				itemId = Integer.parseInt(id);
+			} catch (NullPointerException | NumberFormatException e) {
+				res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				res.getWriter().println("Items ids not valid");
+				return;
+			}
 			try {
 				/**
 				 * If one of the ids cannot be parsed or if one of them is not a current user
 				 * property return an error
 				 */
-				if (itemId == null || !udd.isUserItem(user.getId(), itemId)) {
-					sendErrorMessage(req, res, "Id not valid");
+				Boolean isUserItem = udd.isUserItem(user.getId(), itemId);
+
+				if (itemId == null || !isUserItem) {
+					res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					res.getWriter().println("Incorrect param values");
 					return;
 				}
 				itemIds.add(itemId);
 			} catch (SQLException e) {
-				e.printStackTrace();
+				res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				res.getWriter().println("Server error");
+				return;
 			}
 		}
 
@@ -92,15 +101,26 @@ public class ConfirmAuction extends HttpServlet {
 		try {
 			price = idao.getItemsPrice(itemIds);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
+			return;
 		}
 
 		/**
 		 * Now all the ids must be valid check the rest of the data
 		 */
-		Integer min_incr = Integer.parseInt(min_increment);
+		Integer min_incr;
+		try {
+			min_incr = Integer.parseInt(min_increment);
+		} catch (NullPointerException | NumberFormatException e) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Minimum increment not valid");
+			return;
+		}
+
 		if (min_incr == null || min_incr < 1) {
-			sendErrorMessage(req, res, "Minimum increment must be grater than 1");
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Minimum increment not valid");
 			return;
 		}
 
@@ -118,11 +138,13 @@ public class ConfirmAuction extends HttpServlet {
 			 */
 			LocalDateTime now = LocalDateTime.now();
 			if (!dateTime.isAfter(now)) {
-				sendErrorMessage(req, res, "Date time must be in the future");
+				res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				res.getWriter().println("Date time must be in the future");
 				return;
 			}
 		} catch (DateTimeParseException e) {
-			sendErrorMessage(req, res, "Date time format not valid");
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Date format not valid");
 			return;
 		}
 
@@ -140,18 +162,20 @@ public class ConfirmAuction extends HttpServlet {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				e1.printStackTrace();
+				// ingore
 			}
-			sendErrorMessage(req, res, "SQL error: " + e.getMessage());
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
 			return;
 		}
 
 		/**
 		 * If nothing failed
 		 */
-		res.sendRedirect("sell");
+		res.setStatus(HttpServletResponse.SC_OK);
+		res.getWriter().println("Auction created");
 	}
-	
+
 	public void destroy() {
 		try {
 			if (connection != null) {
