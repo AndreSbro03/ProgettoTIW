@@ -1,0 +1,32 @@
+/**
+ * SingUp manager
+ */
+
+(function() { // avoid variables ending up in the global scope
+	
+	document.getElementById("singup-button").addEventListener('click', (e) => {
+		var form = e.target.closest("form");
+		if (form.checkValidity()) {
+			makeCall("POST", 'singup', form,
+				function(x) {
+					if (x.readyState == XMLHttpRequest.DONE) {
+						var message = x.responseText;
+						switch (x.status) {
+							case 200:
+								sessionStorage.setItem('username', message);
+								window.location.href = "astemi.html";
+								break;
+							case 400: // bad request
+							case 500: // server error
+								errorMessageBanner.show(message);
+								break;
+						}
+					}
+				}
+			);
+		} else {
+			form.reportValidity();
+		}
+	});
+
+})();

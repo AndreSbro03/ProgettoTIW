@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.*;
 
+import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.UserDataDAO;
 import it.polimi.tiw.generals.AuctionUtils;
 
@@ -19,22 +20,10 @@ import it.polimi.tiw.generals.AuctionUtils;
 @WebServlet("/singup")
 public class SingUp extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private final String formPath = "signup.jsp";
 	Connection connection;
 
 	public void init() throws ServletException {
 		connection = AuctionUtils.openDbConnection(getServletContext());
-	}
-
-	private void sendErrorMessage(HttpServletRequest req, HttpServletResponse res, String msg) throws IOException {
-		HttpSession session = req.getSession(true);
-		session.setAttribute("errorMsg", msg);
-		res.sendRedirect(formPath);
-	}
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -46,32 +35,63 @@ public class SingUp extends HttpServlet {
 		String password = req.getParameter("password");
 		String confirm_pw = req.getParameter("confirm-pw");
 
-		res.setContentType("text/plain");
 
-		if (!password.equals(confirm_pw)) {
-			sendErrorMessage(req, res, "Password Mismatch");
+		/**
+		 * Check every field is not null
+		 */
+		if(name == null || surname == null || address == null || username == null || password == null || confirm_pw == null) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("All fields must be filled");
 			return;
 		}
 		
 		/**
-		 * TODO: Check data 
+		 * Check name all fields length (they should be equal the values in the db
 		 */
+		if(
+				username.length() < 4 || username.length() > 32 ||
+				name.length() < 1 || name.length() > 32 ||
+				surname.length() < 1 || surname.length() > 32 ||
+				address.length() < 4 || address.length() > 256 ||
+				password.length() < 4 || password.length() > 32 
+		) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Parameters too long or too short");
+			return;
+		}
+		
+		/**
+		 * The passwords should be equals 
+		 */
+		if (!password.equals(confirm_pw)) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Passwords mismatch");
+			return;
+		}
+		
 		
 		/**
 		 * Add user to the db
 		 */
 		UserDataDAO udd = new UserDataDAO(connection);
+		int uId = 0;
 		try {
-			udd.addUser(username, password, name, surname, address);
-		} catch (Exception e) {
-			sendErrorMessage(req, res, "SQL error: " + e.getMessage());
+			uId = udd.addUser(username, password, name, surname, address);
+		} catch (SQLException e) {
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
 			return;
 		}
 
 		/**
-		 * Redirect to the sell management page 
+		 * Save user in session
 		 */
-		res.sendRedirect("login.jsp");
+		User user = new User(uId, name, surname, username, address);
+		req.getSession().setAttribute("user", user);
+		res.setStatus(HttpServletResponse.SC_OK);
+		res.setContentType("application/json");
+		res.setCharacterEncoding("UTF-8");
+		res.getWriter().println(user.getUsername());
 	}
 
 	public void destroy() {
