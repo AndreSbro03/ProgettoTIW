@@ -21,8 +21,11 @@ public class LogOut extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		HttpSession session = req.getSession();
 		session.invalidate();
-		res.sendRedirect("homepage.html");
 		
+		res.setStatus(HttpServletResponse.SC_OK);
+		res.setContentType("application/json");
+		res.setCharacterEncoding("UTF-8");
+		res.getWriter().println("Logged Out");
 	}
 
 }

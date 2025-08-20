@@ -1,6 +1,7 @@
 package it.polimi.tiw.servlets.user;
 
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import it.polimi.tiw.generals.AuctionUtils;
  * Servlet implementation class SingUp
  */
 @WebServlet("/singup")
+@MultipartConfig
 public class SingUp extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	Connection connection;

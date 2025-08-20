@@ -22,6 +22,26 @@ var pageOrchestrator;
 		document.getElementById("add-item-btn").addEventListener("click", () => pageOrchestrator.show("ITEM-FORM"));
 		document.getElementById("add-auction-btn").addEventListener("click", () => pageOrchestrator.show("AUCTION-FORM"));
 
+		document.getElementById("logout-btn").addEventListener("click", () => {
+			makeCall("GET", "get-user-data", null, (x) => {
+				if (x.readyState == XMLHttpRequest.DONE) {
+					var message = x.responseText;
+					switch (x.status) {
+						case 200: // OK
+							sessionStorage.removeItem('username');
+							window.location.href = "index.html";
+							break;
+						case 500: // server error
+							errorMessageBanner.show(message);
+							break;
+						default:
+							throw new Error("Unimplemented response to error");
+					}
+				}
+
+			}, true);
+		});
+
 		pageOrchestrator.start();
 		pageOrchestrator.refresh();
 
