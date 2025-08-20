@@ -22,8 +22,7 @@ import it.polimi.tiw.generals.AuctionUtils;
 @MultipartConfig
 public class LogIn extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
-	Connection connection;
+	private Connection connection;
 
 	public void init() throws ServletException {
 		connection = AuctionUtils.openDbConnection(getServletContext());

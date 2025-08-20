@@ -57,7 +57,8 @@ var pageOrchestrator;
 				title: this.title,
 				starting: document.getElementById("buy-page"),
 				aNumber: document.getElementById("auction-number"),
-				auctions: document.getElementById("buy-auctions")
+				auctions: document.getElementById("buy-auctions"),
+				search: document.getElementById("buy-search-form")
 			}
 			);
 
@@ -130,14 +131,14 @@ var pageOrchestrator;
 
 		}
 
-		this.show = function(page) {
+		this.show = function(page, args) {
 			console.log("Resquest to show: " + page);
 			window.scrollTo(0, 0);
 			this.reset();
 
 			switch (page) {
 				case "BUY":
-					buy.show();
+					buy.show(args);
 					break;
 				case "SELL":
 					sell.show();
