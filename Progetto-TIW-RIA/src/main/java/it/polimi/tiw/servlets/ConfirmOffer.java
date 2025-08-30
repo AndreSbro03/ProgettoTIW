@@ -102,13 +102,6 @@ public class ConfirmOffer extends HttpServlet {
 			return;
 		}
 		if(LocalDateTime.now().isAfter(auction.getDateTime())) {
-			try {
-				adao.markAuctionAsFinished(auction.getId());
-			} catch (SQLException e) {
-				res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				res.getWriter().println("Server error");
-				return;
-			}
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			res.getWriter().println("Auction already ended");
 			return;

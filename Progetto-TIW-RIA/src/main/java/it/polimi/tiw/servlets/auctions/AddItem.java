@@ -46,8 +46,17 @@ public class AddItem extends HttpServlet {
 		 */
 		String name = request.getParameter("name");
 		String descr = request.getParameter("description");
-		Part imagePart = request.getPart("image");
 		String price = request.getParameter("price");
+		
+
+		Part imagePart = null;
+		try {
+			imagePart = request.getPart("image");
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Server error");
+			return;
+		}
 
 		/**
 		 * Create the item so that the constructor can check the validity of the fields
@@ -82,19 +91,30 @@ public class AddItem extends HttpServlet {
 		 */
 		ItemDAO idao = new ItemDAO(connection);
 		int itemId = 0;
-		/*
-		 * TODO: rollback se il salvataggio dell'immagine va male
-		 */
+		
 		try {
+			connection.setAutoCommit(false);
 			itemId = idao.addItem(user.getId(), name, descr, fprice);
 			/**
 			 * Save the image passed with the id assigned
 			 */
 			ItemImage.saveImage(getServletContext(), imagePart, itemId);
-		} catch (SQLException e) {
+			connection.commit();
+		} catch (Exception e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				//ignore
+			}
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Server error");
 			return;
+		} finally {
+			try {
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				// ignore
+			}
 		}
 
 		response.setStatus(HttpServletResponse.SC_OK);

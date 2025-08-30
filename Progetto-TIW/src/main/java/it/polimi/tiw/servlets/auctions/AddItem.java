@@ -10,6 +10,7 @@ import java.sql.*;
 
 import it.polimi.tiw.beans.Item;
 import it.polimi.tiw.beans.User;
+import it.polimi.tiw.dao.ItemDAO;
 import it.polimi.tiw.generals.AuctionUtils;
 import it.polimi.tiw.servlets.ItemImage;
 
@@ -56,14 +57,23 @@ public class AddItem extends HttpServlet {
 		 */
 		String name = request.getParameter("name");
 		String descr = request.getParameter("description");
-		Part imagePart = request.getPart("image");
 		String price = request.getParameter("price");
 
+		Part imagePart = null;
+		try {
+			imagePart = request.getPart("image");
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Server error");
+			return;
+		}
+		
 		/**
 		 * Create the item so that the constructor can check the validity of the fields
 		 */
+		float fprice = 0.f;
 		try {
-			Item.isValid(name, descr, price);
+			fprice = Item.isValid(name, descr, price);
 		} catch (Exception e) {
 			sendErrorMessage(request, response, e.getMessage());
 			return;
@@ -82,48 +92,35 @@ public class AddItem extends HttpServlet {
 			sendErrorMessage(request, response, "File format not permitted");
 			return;
 		}
-
+		
 		/**
 		 * Insert the item into the db
 		 */
-		String query = "INSERT INTO astemi.item (userID, name, descr, price) VALUES (?, ?, ?, ?)";
-		PreparedStatement statement = null;
-		ResultSet generatedKeys = null;
+		ItemDAO idao = new ItemDAO(connection);
+		int itemId = 0;
+		
 		try {
-			statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-			statement.setInt(1, user.getId());
-			statement.setString(2, name);
-			statement.setString(3, descr);
-			statement.setFloat(4, Float.parseFloat(price));
-			statement.executeUpdate();
-			
-			/**
-			 * Retrieve the generated key
-			 */
-			generatedKeys = statement.getGeneratedKeys();
-			int itemId = -1;
-			if (generatedKeys.next()) {
-				itemId = generatedKeys.getInt(1);
-			}
-			
+			connection.setAutoCommit(false);
+			itemId = idao.addItem(user.getId(), name, descr, fprice);
 			/**
 			 * Save the image passed with the id assigned
 			 */
 			ItemImage.saveImage(getServletContext(), imagePart, itemId);
-			
-		} catch (SQLException e) {
-			sendErrorMessage(request, response, "SQL error: " + e.getMessage());
-			return;
-		} catch (RuntimeException e2) {
-			sendErrorMessage(request, response, e2.getMessage());
+			connection.commit();
+		} catch (Exception e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				//ignore
+			}
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Server error");
 			return;
 		} finally {
 			try {
-				if(statement != null) statement.close();
-				if(generatedKeys != null) generatedKeys.close();
-			} catch (Exception e1) {
-				sendErrorMessage(request, response, "SQL STMT ERROR: " + e1.getMessage());
-				return;
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				// ignore
 			}
 		}
 
