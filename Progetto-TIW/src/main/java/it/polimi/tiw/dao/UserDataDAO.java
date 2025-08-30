@@ -15,15 +15,16 @@ public class UserDataDAO {
 		this.connection = connection;
 	}
 
-	public void addUser(String username, String password, String name, String surname, String address)
-			throws Exception {
+	public int addUser(String username, String password, String name, String surname, String address)
+			throws SQLException {
 		String query = "INSERT INTO user (username, password, name, surname, address) VALUES (?,?,?,?,?)";
 
 		PreparedStatement statement = null;
-
+		ResultSet rs = null;
+		int key = 0;
 		try {
 
-			statement = connection.prepareStatement(query);
+			statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
 			statement.setString(1, username);
 			statement.setString(2, password);
@@ -33,19 +34,33 @@ public class UserDataDAO {
 
 			statement.executeUpdate();
 
+			/**
+			 * Retrieve the generated key
+			 */
+			rs = statement.getGeneratedKeys();
+			if (rs.next()) {
+				key = rs.getInt(1);
+			}
+
 		} catch (SQLException e) {
 			throw e;
 		} finally {
 			try {
-				statement.close();
+				if (statement != null)
+					statement.close();
+				if (rs != null)
+					rs.close();
 			} catch (Exception e1) {
 				throw e1;
 			}
 		}
+
+		return key;
 	}
 
 	/**
-	 * Return all the items that a user have loaded.
+	 * Return all the items that a user have loaded, if nothing is found return an
+	 * empty list.
 	 * 
 	 * @param freeFromAuction if {@code true} only the items not in a auction will
 	 *                        be returned.
@@ -139,17 +154,17 @@ public class UserDataDAO {
 
 		return out;
 	}
-	
+
 	/**
-	 * Get all user auction, if closed is false than only the open ones if true only the closed ones.
+	 * Get all user auction, if closed is false than only the open ones if true only
+	 * the closed ones.
 	 */
 	public ArrayList<Auction> getUserAuctions(User user, boolean closed) throws SQLException {
-		String query = "SELECT a.auctionID, init_price, min_incr, expiration, finished, " 
-				+ " itemID, i.name as item_name, i.descr as item_descr, i.price as item_price, " 
+		String query = "SELECT a.auctionID, init_price, min_incr, expiration, finished, "
+				+ " itemID, i.name as item_name, i.descr as item_descr, i.price as item_price, "
 				+ "lst_offerID, u.username AS buyer_name, o.price as offer_price "
 				+ "FROM auction AS a LEFT JOIN item AS i ON i.auctionID = a.auctionID LEFT JOIN offer AS o ON a.lst_offerID = o.offerID LEFT JOIN user AS u ON o.userID = u.userID "
-				+ "WHERE a.userID = ? AND a.finished = ? " 
-				+ "ORDER BY a.expiration ASC;";
+				+ "WHERE a.userID = ? AND a.finished = ? " + "ORDER BY a.expiration ASC;";
 
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -168,17 +183,19 @@ public class UserDataDAO {
 			throw e;
 		} finally {
 			try {
-				if(ps != null) ps.close();
-				if(rs != null) rs.close();
+				if (ps != null)
+					ps.close();
+				if (rs != null)
+					rs.close();
 			} catch (Exception e1) {
 				throw e1;
 			}
 		}
-		
+
 		return out;
 
 	}
-	
+
 	public User getUserFromUserName(String username) throws SQLException {
 		/**
 		 * Query to get the user data
@@ -212,8 +229,10 @@ public class UserDataDAO {
 			throw e;
 		} finally {
 			try {
-				if(statement != null) statement.close();
-				if(results != null) results.close();
+				if (statement != null)
+					statement.close();
+				if (results != null)
+					results.close();
 			} catch (Exception e1) {
 				throw e1;
 			}
@@ -221,7 +240,7 @@ public class UserDataDAO {
 		return user;
 	}
 
-	public User logIn(String username, String password) throws SQLException, RuntimeException {
+	public User logIn(String username, String password) throws SQLException {
 
 		/**
 		 * Query to get the user data
@@ -245,9 +264,7 @@ public class UserDataDAO {
 			 * If there are no elements return an error else create an User obj and save it
 			 * in the session.
 			 */
-			if (!results.next()) {
-				throw new RuntimeException("No match found");
-			} else {
+			if (results.next()) {
 				int id = results.getInt("userID");
 				String resName = results.getString("name");
 				String resSurname = results.getString("surname");
@@ -258,12 +275,12 @@ public class UserDataDAO {
 
 		} catch (SQLException e) {
 			throw e;
-		} catch (RuntimeException e2) {
-			throw e2;
 		} finally {
 			try {
-				statement.close();
-				results.close();
+				if (statement != null)
+					statement.close();
+				if (results != null)
+					results.close();
 			} catch (Exception e1) {
 				throw e1;
 			}

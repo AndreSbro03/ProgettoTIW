@@ -34,11 +34,6 @@ public class AddItem extends HttpServlet {
 		res.sendRedirect(formPath);
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -62,7 +57,7 @@ public class AddItem extends HttpServlet {
 		Part imagePart = null;
 		try {
 			imagePart = request.getPart("image");
-		} catch (Exception e) {
+		} catch (IllegalStateException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Server error");
 			return;

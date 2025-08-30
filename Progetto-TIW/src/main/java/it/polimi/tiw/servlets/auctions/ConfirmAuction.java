@@ -26,11 +26,6 @@ public class ConfirmAuction extends HttpServlet {
 		connection = AuctionUtils.openDbConnection(getServletContext());
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
 	private void sendErrorMessage(HttpServletRequest req, HttpServletResponse res, String msg) throws IOException {
 		 HttpSession session = req.getSession(true);
 		 session.setAttribute("errorMsg", msg); 
@@ -38,6 +33,16 @@ public class ConfirmAuction extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		/**
+		 * First check if there is an user logged in. If not redirect to the login page.
+		 */
+		HttpSession session = req.getSession();
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			res.sendRedirect("login.jsp");
+			return;
+		}
+		
 		/**
 		 * Get the form parameters
 		 */
@@ -51,15 +56,6 @@ public class ConfirmAuction extends HttpServlet {
 			return;
 		}
 
-		/**
-		 * First check if there is an user logged in. If not redirect to the login page.
-		 */
-		HttpSession session = req.getSession();
-		User user = (User) session.getAttribute("user");
-		if (user == null) {
-			res.sendRedirect("login.jsp");
-			return;
-		}
 
 		UserDataDAO udd = new UserDataDAO(connection);
 
@@ -67,20 +63,31 @@ public class ConfirmAuction extends HttpServlet {
 		 * Check that all the ids are user items and collect the price.
 		 */
 		ArrayList<Integer> itemIds = new ArrayList<Integer>();
+		
 		for (String id : ids) {
-			Integer itemId = Integer.parseInt(id);
+			Integer itemId;
+			try {
+				itemId = Integer.parseInt(id);
+			} catch (NullPointerException | NumberFormatException e) {
+				sendErrorMessage(req, res, "Id not valid");
+				return;
+			}
 			try {
 				/**
 				 * If one of the ids cannot be parsed or if one of them is not a current user
 				 * property return an error
 				 */
-				if (itemId == null || !udd.isUserItem(user.getId(), itemId)) {
+				Boolean isUserItem = udd.isUserItem(user.getId(), itemId);
+
+				if (itemId == null || !isUserItem) {
 					sendErrorMessage(req, res, "Id not valid");
 					return;
 				}
 				itemIds.add(itemId);
 			} catch (SQLException e) {
-				e.printStackTrace();
+				res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				res.getWriter().println("Server error");
+				return;
 			}
 		}
 
@@ -92,13 +99,22 @@ public class ConfirmAuction extends HttpServlet {
 		try {
 			price = idao.getItemsPrice(itemIds);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
+			return;
 		}
 
 		/**
 		 * Now all the ids must be valid check the rest of the data
 		 */
-		Integer min_incr = Integer.parseInt(min_increment);
+		Integer min_incr;
+		try {
+			min_incr = Integer.parseInt(min_increment);
+		} catch (NullPointerException | NumberFormatException e) {
+			sendErrorMessage(req, res, "Invalid min incr");
+			return;
+		}
+		
 		if (min_incr == null || min_incr < 1) {
 			sendErrorMessage(req, res, "Minimum increment must be grater than 1");
 			return;
@@ -140,9 +156,10 @@ public class ConfirmAuction extends HttpServlet {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				e1.printStackTrace();
+				// ingore
 			}
-			sendErrorMessage(req, res, "SQL error: " + e.getMessage());
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
 			return;
 		}
 

@@ -29,10 +29,6 @@ public class CloseAuction extends HttpServlet {
 		connection = AuctionUtils.openDbConnection(getServletContext());
 	}
        
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-	
 	private void sendErrorMessage(HttpServletRequest req, HttpServletResponse res, String msg, int auctionId) throws IOException {
 		HttpSession session = req.getSession(true);
 		session.setAttribute("errorMsg", msg);
@@ -71,7 +67,9 @@ public class CloseAuction extends HttpServlet {
 		try {
 			auction = adao.getAuctionFromId(auctionId);
 		} catch (Exception e) {
-			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
+			return;
 		}
 		
 		if(auction == null) {

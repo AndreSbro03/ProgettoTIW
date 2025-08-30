@@ -22,7 +22,7 @@ public class LogIn extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final String formPath = "login.jsp";
 
-	Connection connection;
+	private Connection connection;
 
 	public void init() throws ServletException {
 		connection = AuctionUtils.openDbConnection(getServletContext());
@@ -32,11 +32,6 @@ public class LogIn extends HttpServlet {
 		HttpSession session = req.getSession(true);
 		session.setAttribute("errorMsg", msg);
 		res.sendRedirect(formPath);
-	}
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -50,34 +45,30 @@ public class LogIn extends HttpServlet {
 		/**
 		 * Check that they are both not null
 		 */
-		if (username == null || password == null) {
-			sendErrorMessage(req, res, "Fill all the forms");
+		if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
+			sendErrorMessage(req, res, "Fill all the form");
 			return;
 		}
-
-		res.setContentType("text/plain");
 		
 		UserDataDAO udd = new UserDataDAO(connection);
 		User user;
 		
 		try {
 			user = udd.logIn(username, password);
-		} catch (RuntimeException e) {
-			sendErrorMessage(req, res, e.getMessage());
-			return;
-		} catch (SQLException e1) {
-			sendErrorMessage(req, res, "SQL error: " + e1.getMessage());
+		} catch (SQLException e) {
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
 			return;
 		}
 
-		HttpSession session = req.getSession();
-		session.setAttribute("user", user);
+		if(user != null) {
+			HttpSession session = req.getSession();
+			session.setAttribute("user", user);
+			res.sendRedirect("sell");
+		} else {
+			sendErrorMessage(req, res, "Invalid credentials");
+		}
 		
-		/**
-		 * Redirect to the sell management page 
-		 */
-		res.sendRedirect("sell");
-
 	}
 
 	public void destroy() {

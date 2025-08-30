@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.*;
 
+import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.UserDataDAO;
 import it.polimi.tiw.generals.AuctionUtils;
 
@@ -32,11 +33,6 @@ public class SingUp extends HttpServlet {
 		res.sendRedirect(formPath);
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
 		String name = req.getParameter("name");
@@ -46,32 +42,52 @@ public class SingUp extends HttpServlet {
 		String password = req.getParameter("password");
 		String confirm_pw = req.getParameter("confirm-pw");
 
-		res.setContentType("text/plain");
-
-		if (!password.equals(confirm_pw)) {
-			sendErrorMessage(req, res, "Password Mismatch");
+		/**
+		 * Check every field is not null
+		 */
+		if (name == null || surname == null || address == null || username == null || password == null
+				|| confirm_pw == null) {
+			sendErrorMessage(req, res, "All fields must be filled");
 			return;
 		}
-		
+
 		/**
-		 * TODO: Check data 
+		 * Check name all fields length (they should be equal the values in the db
 		 */
-		
+		if (username.length() < 4 || username.length() > 32 || name.length() < 1 || name.length() > 32
+				|| surname.length() < 1 || surname.length() > 32 || address.length() < 4 || address.length() > 256
+				|| password.length() < 4 || password.length() > 32) {
+			sendErrorMessage(req, res, "Parameters too long or too short");
+			return;
+		}
+
+		/**
+		 * The passwords should be equals
+		 */
+		if (!password.equals(confirm_pw)) {
+			sendErrorMessage(req, res, "Passwords mismatch");
+			return;
+		}
+
 		/**
 		 * Add user to the db
 		 */
 		UserDataDAO udd = new UserDataDAO(connection);
+		int uId = 0;
 		try {
-			udd.addUser(username, password, name, surname, address);
-		} catch (Exception e) {
-			sendErrorMessage(req, res, "SQL error: " + e.getMessage());
+			uId = udd.addUser(username, password, name, surname, address);
+		} catch (SQLException e) {
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
 			return;
 		}
 
 		/**
-		 * Redirect to the sell management page 
+		 * Save user in session
 		 */
-		res.sendRedirect("login.jsp");
+		User user = new User(uId, name, surname, username, address);
+		req.getSession().setAttribute("user", user);
+		res.sendRedirect("sell");
 	}
 
 	public void destroy() {

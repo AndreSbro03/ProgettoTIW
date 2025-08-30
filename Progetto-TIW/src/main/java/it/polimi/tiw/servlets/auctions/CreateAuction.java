@@ -30,7 +30,7 @@ import it.polimi.tiw.generals.AuctionUtils;
 public class CreateAuction extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private final String formPath = "create-auction.jsp";
-	Connection connection;
+	private Connection connection;
 
 	public void init() throws ServletException {
 		connection = AuctionUtils.openDbConnection(getServletContext());
@@ -56,7 +56,9 @@ public class CreateAuction extends HttpServlet {
 		try {
 			items = udd.getUserItems(user.getId(), true);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
+			return;
 		}
 		
 		/**
@@ -68,9 +70,6 @@ public class CreateAuction extends HttpServlet {
 		dispatcher.forward(req, res);
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
 	
 	public void destroy() {
 		try {

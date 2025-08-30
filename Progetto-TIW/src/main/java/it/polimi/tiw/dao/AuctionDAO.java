@@ -4,7 +4,6 @@ import java.sql.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 
@@ -12,9 +11,6 @@ import it.polimi.tiw.beans.Auction;
 import it.polimi.tiw.beans.Item;
 import it.polimi.tiw.beans.Offer;
 
-/**
- * Progetto TIW NO RIA
- */
 public class AuctionDAO {
 	private Connection connection;
 
@@ -24,19 +20,34 @@ public class AuctionDAO {
 
 	public int addAuction(int userId, float initPrice, int minIncr, LocalDateTime ldt) throws SQLException {
 		String query = "INSERT INTO auction (userID, init_price, min_incr, expiration) VALUES (?,?,?,?)";
-		PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-		ps.setInt(1, userId);
-		ps.setFloat(2, initPrice);
-		ps.setInt(3, minIncr);
-		ps.setTimestamp(4, Timestamp.valueOf(ldt));
-		ps.executeUpdate();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int auctionId = 0; 
 
-		int auctionId;
-		ResultSet rs = ps.getGeneratedKeys();
-		rs.next();
-		auctionId = rs.getInt(1);
+		try {
+			ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			ps.setInt(1, userId);
+			ps.setFloat(2, initPrice);
+			ps.setInt(3, minIncr);
+			ps.setTimestamp(4, Timestamp.valueOf(ldt));
+			ps.executeUpdate();
 
-		ps.close();
+			rs = ps.getGeneratedKeys();
+			if(rs.next()) auctionId = rs.getInt(1);
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (rs != null)
+					rs.close();
+			} catch (Exception e1) {
+				throw e1;
+			}
+		}
+	
 		return auctionId;
 	}
 

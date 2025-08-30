@@ -71,7 +71,9 @@ public class Buy extends HttpServlet {
 		try {
 			auctions = ad.getAllAuction();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
+			return;
 		}
 		
 		if(word != null) {

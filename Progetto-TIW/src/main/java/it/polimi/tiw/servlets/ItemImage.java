@@ -2,7 +2,6 @@ package it.polimi.tiw.servlets;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -12,7 +11,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
-@WebServlet("/images/*")
+@WebServlet("/images")
 public class ItemImage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -40,34 +39,45 @@ public class ItemImage extends HttpServlet {
 
 	}
 
-	public static String getImageUrl(Integer id) {
+	private static String getImageUrl(Integer id) {
 		if (id == null)
 			return DEFAULT_IMAGE;
 		File imgFile = new File(BASE_DIR, id + ".jpg");
 		if (imgFile.exists()) {
-			return "images/" + id + ".jpg";
+			return id + ".jpg";
 		} else {
 			return DEFAULT_IMAGE;
 		}
 	}
 
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		String fileName = req.getPathInfo().substring(1);
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+		String reqId = req.getParameter("itemId");
+		Integer id; 
+		try {
+			id = Integer.parseInt(reqId);
+		} catch (NumberFormatException | NullPointerException e) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Incorrect param values");
+			return;
+		}
+		
+		String fileName = getImageUrl(id);
 		File file = new File(BASE_DIR, fileName);
+		System.out.println("Requeste access to: " + file.getAbsolutePath());
 
 		if (!file.exists()) {
 			file = new File(getServletContext().getRealPath(DEFAULT_IMAGE));
-		}
-
+		} 
+		
 		if (!file.exists()) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			res.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
-		resp.setContentType("image/jpeg");
-		resp.setContentLengthLong(file.length());
+		res.setContentType("image/jpeg");
+		res.setContentLengthLong(file.length());
 
-		try (FileInputStream fis = new FileInputStream(file); ServletOutputStream os = resp.getOutputStream()) {
+		try (FileInputStream fis = new FileInputStream(file); ServletOutputStream os = res.getOutputStream()) {
 			fis.transferTo(os);
 		}
 	}
