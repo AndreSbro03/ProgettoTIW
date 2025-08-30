@@ -51,7 +51,8 @@ public class Sell extends HttpServlet {
 			closedAuctions = udd.getUserAuctions(user, true);
 			openAuctions = udd.getUserAuctions(user, false);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
 			return;
 		}
 		

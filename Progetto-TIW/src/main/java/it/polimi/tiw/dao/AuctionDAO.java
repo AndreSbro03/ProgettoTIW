@@ -268,5 +268,42 @@ public class AuctionDAO {
 		return offers;
 		
 	}
+	
+	public ArrayList<Auction> getAucitonWonBy(String username) throws SQLException{
+		String query = "SELECT a.auctionID, a.init_price, a.min_incr, a.expiration, a.finished, "
+				+ "						u1.userID AS vendorID, u1.username AS vendor_username, "
+				+ "				        i.itemID, i.price AS item_price, i.name AS item_name, i.descr AS item_descr, "
+				+ "				        a.lst_offerID, o.price AS offer_price, u2.username AS buyer_name "
+				+ "FROM auction as a JOIN user AS u1 ON a.userID = u1.userID JOIN offer AS o ON a.lst_offerID = o.offerID JOIN user AS u2 ON o.userID = u2.userID JOIN item AS i ON i.auctionID = a.auctionID "
+				+ "WHERE u2.username = ? AND a.finished = true;";
+
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList<Auction> out = null;
+
+		try {
+			/*
+			 * Execute the query
+			 */
+			ps = connection.prepareStatement(query);
+			ps.setString(1, username);
+			rs = ps.executeQuery();
+			out = extractAuction(rs, null);
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (rs != null)
+					rs.close();
+			} catch (Exception e1) {
+				throw e1;
+			}
+		}
+
+		return out;
+	}
 
 }

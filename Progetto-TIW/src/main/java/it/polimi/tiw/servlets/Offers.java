@@ -24,10 +24,10 @@ import it.polimi.tiw.generals.AuctionState;
 import it.polimi.tiw.generals.AuctionUtils;
 
 /**
- * Servlet implementation class AuctionDetails
+ * Servlet implementation class Offer
  */
-@WebServlet("/auction-details")
-public class AuctionDetails extends HttpServlet {
+@WebServlet("/offers")
+public class Offers extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
 
@@ -36,6 +36,7 @@ public class AuctionDetails extends HttpServlet {
 	}
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		
 		Integer auctionId;
 		try {
 			auctionId = Integer.parseInt(req.getParameter("auctionId"));
@@ -44,8 +45,8 @@ public class AuctionDetails extends HttpServlet {
 		}
 
 		Auction auction = null;
-		User winner = null;
 		ArrayList<Offer> offers = null;
+		req.setAttribute("isUserOwner", false);
 
 		if (auctionId != null) {
 
@@ -64,25 +65,13 @@ public class AuctionDetails extends HttpServlet {
 			if (auction != null) {
 
 				/**
-				 * The auction is finished
+				 * The auction is finished?
 				 */
 				if (LocalDateTime.now().isAfter(auction.getDateTime())) {
-
 					if (auction.getFinished())
 						auction.setState(AuctionState.CLOSED);
 					else
 						auction.setState(AuctionState.EXPIRED);
-
-					if (auction.getLstOffer() != null) {
-						UserDataDAO udd = new UserDataDAO(connection);
-						try {
-							winner = udd.getUserFromUserName(auction.getLstOffer().getUsername());
-						} catch (SQLException e) {
-							res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-							res.getWriter().println("Server error");
-							return;
-						}
-					}
 				} else {
 					auction.setState(AuctionState.OPEN);
 				}
@@ -103,12 +92,11 @@ public class AuctionDetails extends HttpServlet {
 				 */
 				HttpSession session = req.getSession();
 				User user = (User) session.getAttribute("user");
-				if (user == null || !user.getUsername().equals(auction.getUsername())) {
+				if (user != null && user.getUsername().equals(auction.getUsername())) {
 					/**
-					 * User is not the owner of the auction
+					 * Yes the user is the owner
 					 */
-					res.sendRedirect("login.jsp");
-					return;
+					req.setAttribute("isUserOwner", true);
 				}
 			}
 		}
@@ -116,10 +104,9 @@ public class AuctionDetails extends HttpServlet {
 		/**
 		 * Show the page with all the details
 		 */
-		String path = "/auction-details.jsp";
+		String path = "/offer.jsp";
 		req.setAttribute("auction", auction);
 		req.setAttribute("offers", offers);
-		req.setAttribute("winner", winner);
 		RequestDispatcher dispatcher = req.getRequestDispatcher(path);
 		dispatcher.forward(req, res);
 
@@ -133,5 +120,6 @@ public class AuctionDetails extends HttpServlet {
 		} catch (SQLException ingore) {
 		}
 	}
+
 
 }

@@ -89,41 +89,20 @@
 						</div>
 
 						<c:choose>
-							<c:when test="${auction.state == AuctionState.CLOSED }">
-								<!-- Auction is closed (Show the info) -->
-								<div class="item-container" style="color: white;">
-									<c:choose>
-										<c:when test="${winner == null}">
-											<p>No one offered for this auction</p>
-										</c:when>
-										<c:otherwise>
-											<div class="padding">
-												<h2>The auction was won by:</h2>
-												<p>UserName: ${winner.username}</p>
-												<p>Name: ${winner.name}</p>
-												<p>Surname: ${winner.surname}</p>
-												<p>Address: ${winner.address}</p>
-											</div>
-										</c:otherwise>
-									</c:choose>
+							<c:when test="${auction.state == AuctionState.OPEN }">
+								<!-- Auction is open (You can put an offer) -->
+								<div class="place-offer">
+									<form class="form" action="confirm-offer" method="POST">
+										<label class="form-label">Place Offer</label> <input
+											class="digit-input" type="number" name="import"
+											placeholder="Import"> <input type="hidden"
+											name="auctionId" value="${auction.id}"> <input
+											class="submit-input" type="submit" value="Offer">
+									</form>
 								</div>
 							</c:when>
 							<c:otherwise>
-								<c:choose>
-									<c:when test="${auction.state == AuctionState.EXPIRED }">
-										<!-- Auction is expired (You can close it) -->
-										<div class="place-offer">
-											<form class="form" action="close-auction" method="POST">
-												<input type="hidden" name="auctionId" value="${auction.id}">
-												<input class="submit-input" type="submit"
-													value="Close Auction">
-											</form>
-										</div>
-									</c:when>
-									<c:otherwise>
-										<!-- You can't do nothing -->
-									</c:otherwise>
-								</c:choose>
+								<!-- You can't do nothing -->
 							</c:otherwise>
 						</c:choose>
 					</div>

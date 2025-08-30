@@ -8,6 +8,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -47,13 +49,24 @@ public class Buy extends HttpServlet {
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		
+		/**
+		 * Get session user, if not present redirect to login
+		 */
+		HttpSession session = req.getSession();
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			res.sendRedirect("login.jsp");
+			return;
+		}
+		
 		String word = req.getParameter("key-word");
 		
 		/**
 		 * Get all auctions
 		 */
 		AuctionDAO ad = new AuctionDAO(connection);
-		ArrayList<Auction> auctions = new ArrayList<Auction>();
+		ArrayList<Auction> auctions = null;
 		ArrayList<Auction> out = null;
 		try {
 			auctions = ad.getAllAuction();
@@ -67,10 +80,22 @@ public class Buy extends HttpServlet {
 			out = auctions;
 		}
 		
+		/**
+		 * Get all auciton won by the user
+		 */
+		ArrayList<Auction> won = null;
+		try {
+			won = ad.getAucitonWonBy(user.getUsername());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		res.setContentType("text/plain");
 		String path = "/buylist.jsp";
 		req.setAttribute("number", out.size());
 		req.setAttribute("auctions", out);
+		req.setAttribute("wonNumber", won.size());
+		req.setAttribute("wonAuctions", won);
 		RequestDispatcher dispatcher = req.getRequestDispatcher(path);
 		dispatcher.forward(req, res);
 	}
