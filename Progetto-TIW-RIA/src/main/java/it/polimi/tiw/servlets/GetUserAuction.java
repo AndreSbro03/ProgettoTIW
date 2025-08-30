@@ -1,6 +1,5 @@
 package it.polimi.tiw.servlets;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,13 +12,11 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.beans.Auction;
-import it.polimi.tiw.beans.Offer;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.AuctionDAO;
 import it.polimi.tiw.dao.UserDataDAO;
@@ -28,10 +25,10 @@ import it.polimi.tiw.generals.AuctionUtils;
 import it.polimi.tiw.generals.LocalDateTimeAdapter;
 
 /**
- * Servlet implementation class AuctionDetails
+ * Servlet implementation class GetUserAuction
  */
-@WebServlet("/get-auction-details")
-public class GetAuctionDetails extends HttpServlet {
+@WebServlet("/get-user-auction")
+public class GetUserAuction extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
 
@@ -41,6 +38,17 @@ public class GetAuctionDetails extends HttpServlet {
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		
+		/**
+		 * First check if there is an user logged in. If not redirect to the login page.
+		 */
+		HttpSession session = req.getSession();
+		User user = (User) session.getAttribute("user");
+		if (user == null) {
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			res.getWriter().println("You must be logged");
+			return;
+		}
+		
 		Integer auctionId;
 		try {
 			auctionId = Integer.parseInt(req.getParameter("auctionId"));
@@ -49,7 +57,7 @@ public class GetAuctionDetails extends HttpServlet {
 			res.getWriter().println("Incorrect param values");
 			return;
 		}
-
+		
 		Auction auction = null;
 
 		if (auctionId != null) {
@@ -68,6 +76,19 @@ public class GetAuctionDetails extends HttpServlet {
 			}
 
 			if (auction != null) {
+				
+				/**
+				 * Check it the request if from the owner of the auction
+				 */
+				if (!user.getUsername().equals(auction.getUsername())) {
+					/**
+					 * User is not the owner of the auction
+					 */
+					res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					res.getWriter().println("You must be logged");
+					return;
+				}
+
 
 				/**
 				 * The auction is finished
@@ -78,6 +99,17 @@ public class GetAuctionDetails extends HttpServlet {
 						auction.setState(AuctionState.CLOSED);
 					else
 						auction.setState(AuctionState.EXPIRED);
+
+					if (auction.getLstOffer() != null) {
+						UserDataDAO udd = new UserDataDAO(connection);
+						try {
+							auction.setWinner(udd.getUserFromUserName(auction.getLstOffer().getUsername()));
+						} catch (SQLException e) {
+							res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+							res.getWriter().println("Server error");
+							return;
+						}
+					}
 				} else {
 					auction.setState(AuctionState.OPEN);
 				}
@@ -121,5 +153,4 @@ public class GetAuctionDetails extends HttpServlet {
 		} catch (SQLException ingore) {
 		}
 	}
-
 }

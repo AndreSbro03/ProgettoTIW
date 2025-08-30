@@ -80,7 +80,7 @@
 								<!-- Items card -->
 								<div class="product-card">
 									<img
-										src="${pageContext.request.contextPath}/${ItemImage.getImageUrl(item.id)}"
+										src="images?itemId=${item.id}"
 										class="product-image" height="150px">
 									<div class="padding">
 										<h2 class="product-name">
@@ -144,7 +144,7 @@
 								<!-- Items card -->
 								<div class="product-card">
 									<img
-										src="${pageContext.request.contextPath}/${ItemImage.getImageUrl(item.id)}"
+										src="images?itemId=${item.id}"
 										class="product-image" height="150px">
 									<div class="padding">
 										<h2 class="product-name">

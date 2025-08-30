@@ -17,55 +17,95 @@
 		this.itemsNumberNode = nodes['itemsNumber'];
 		this.itemsNode = nodes['items'];
 
-		this.show = function(id) {
-			this.startingNode.style.display = "block";
-			makeCall("GET", "get-auction-details?auctionId=" + id, null, (req) => {
-				if (req.readyState == 4) {
-					var message = req.responseText;
-					if (req.status == 200) {
-						var auction = JSON.parse(req.responseText);
-						this.update(auction);
+		this.offers = true;
 
-					} else if (req.status == 403) {
-						//TODO
-					}
-					else {
-						self.alert.textContent = message;
+
+		this.show = function(id, offers) {
+			if (offers === undefined) throw new Error("Chiamata senza specifica di tipo");
+			this.startingNode.style.display = "block";
+			this.offers = offers;
+			if (offers) this.getAuctionDetails(id);
+			else this.getOwnerAuctionDetails(id);
+		}
+
+		this.getOwnerAuctionDetails = function(id, reload = false) {
+			makeCall("GET", "get-user-auction?auctionId=" + id, null, (x) => {
+				if (x.readyState == XMLHttpRequest.DONE) {
+					var message = x.responseText;
+					switch (x.status) {
+						case 200:
+							var auction = JSON.parse(message);
+							if (reload) this.updateOffers(auction, true); // Partialy reload
+							else this.update(auction, true);
+							return;
+						case 401: // unauthorized
+							window.location.href = "index.html";
+							break;
+						default:
+							errorMessageBanner.show(message);
+							break;
 					}
 				}
 			}, true)
 		}
 
-		this.update = function(auction) {
-			var self = this;
-			this.reset();
+		this.getAuctionDetails = function(id, reload = false) {
+			makeCall("GET", "get-auction-details?auctionId=" + id, null, (x) => {
+				if (x.readyState == XMLHttpRequest.DONE) {
+					var message = x.responseText;
+					switch (x.status) {
+						case 200:
+							var auction = JSON.parse(message);
+							if (reload) this.updateOffers(auction, false); // Partialy reload
+							else this.update(auction, false);
+							return;
+						default:
+							errorMessageBanner.show(message);
+							break;
+					}
+				}
+			}, true)
+		}
 
+		this.updateOffers = function(auction, userIsOwner) {
+			if (userIsOwner === undefined) throw new Error("userIsOwner must be defined");
+			this.stateOptionNode.innerHTML = "";
+			this.bestOfferNode.innerHTML = "";
+			this.offersNode.innerHTML = "";
+
+			this.setOffersBox(auction);
+			if (userIsOwner) this.setOwnerAuctionBox(auction);
+			else this.setUserAuctionBox(auction);
+		}
+
+		this.setHeader = function(auction) {
 			/**
 			 * Set title
 			 */
-			self.title.textContent = "Auction n: " + auction.id;
-			self.ownerNode.textContent = auction.username;
-			self.minIncrNode.textContent = "Minimum increment: " + auction.minIncr + "€";
-			self.initPriceNode.textContent = auction.initPrice + "€";
+			this.title.textContent = "Auction n: " + auction.id;
+			this.ownerNode.textContent = auction.username;
+			this.minIncrNode.textContent = "Minimum increment: " + auction.minIncr + "€";
+			this.initPriceNode.textContent = auction.initPrice + "€";
 
 			/**
 			 * Time
 			 */
 			if (auction.state === "OPEN") {
-				addNode(self.expirationNode, "p", "", "Will end the: " + prettyDate(auction.dateTime));
-				var timer = addNode(self.expirationNode, "h2", "");
-				new CountDown(auction.dateTime, timer);
-			} else {
-				addNode(self.expirationNode, "p", "", "Terminated the: " + new Date(auction.dateTime).getDate());
+				addNode(this.expirationNode, "p", "", "Will end the: " + prettyDate(auction.dateTime));
 			}
+			var timer = addNode(this.expirationNode, "h2", "");
+			new CountDown(auction.dateTime, timer);
 
+		}
+
+		this.setOffersBox = function(auction) {
 			/**
 			 * Offers
 			 */
 			if (auction.lstOffer) {
-				addNode(self.bestOfferNode, "h3", "", "BEST OFFER");
-				addNode(self.bestOfferNode, "div", "price", auction.lstOffer.price + "€");
-				addNode(self.bestOfferNode, "p", "", "BY: " + auction.lstOffer.username.toUpperCase())
+				addNode(this.bestOfferNode, "h3", "", "BEST OFFER");
+				addNode(this.bestOfferNode, "div", "price", auction.lstOffer.price + "€");
+				addNode(this.bestOfferNode, "p", "", "BY: " + auction.lstOffer.username.toUpperCase())
 
 				/**
 				 * Offers list
@@ -73,107 +113,151 @@
 				auction.offers.forEach((offer) => this.constructOffer(offer));
 
 			} else {
-				addNode(self.bestOfferNode, "h3", "", "INIT PRICE");
-				addNode(self.bestOfferNode, "div", "price", auction.initPrice + "€");
-				var white = addNode(self.offersNode, "div", "centered", "No offers here, be the first!");
+				addNode(this.bestOfferNode, "h3", "", "INIT PRICE");
+				addNode(this.bestOfferNode, "div", "price", auction.initPrice + "€");
+				var white = addNode(this.offersNode, "div", "centered", "No offers here, be the first!");
 				white.style.color = "white";
 			}
+		}
+
+		this.setOwnerAuctionBox = function(auction) {
+			if (auction.state === "CLOSED") {
+				if (auction.winner) {
+					var p = addNode(this.stateOptionNode, "div", "item-container");
+					p.style.color = "white";
+					p = addNode(p, "div", "padding");
+					if (auction.winner) {
+						addNode(p, "h2", "", "The auction was won by: ");
+						addNode(p, "p", "", "Username: " + auction.winner.username);
+						addNode(p, "p", "", "Surname: " + auction.winner.surname);
+						addNode(p, "p", "", "Name: " + auction.winner.name);
+						addNode(p, "p", "", "Address: " + auction.winner.address);
+					} else {
+						addNode(p, "p", "", "No one offered for this auction");
+					}
+				}
+			}
+			else if (auction.state === "EXPIRED") {
+				/**
+				 * Close auction form
+				 */
+				var p = addNode(this.stateOptionNode, "div", "place-offer");
+				p = addNode(p, "form", "form");
+				p.action = "#";
+				var hidden = addNode(p, "input", "");
+				var submit = addNode(p, "input", "submit-input");
+				hidden.type = "hidden";
+				hidden.name = "auctionId";
+				hidden.value = auction.id;
+				submit.type = "button";
+				submit.value = "Close Auction";
+				var self = this;
+				/**
+				 * POST method to close
+				 */
+				submit.addEventListener('click', (e) => {
+					console.log("Closing auction: " + auction.id);
+					var form = e.target.closest("form");
+					if (form.checkValidity()) {
+						makeCall("POST", "close-auction", form,
+							function(x) {
+								if (x.readyState == XMLHttpRequest.DONE) {
+									var message = x.responseText;
+									switch (x.status) {
+										case 200:
+											// Reload this page
+											if (self.offers) self.getAuctionDetails(auction.id, true);
+											else self.getOwnerAuctionDetails(auction.id, true);
+											return;
+										case 401: // unauthorized
+											window.location.href = "index.html";
+											break;
+										case 400: // bad request
+										case 500: // server error
+											errorMessageBanner.show(message);
+											break;
+									}
+								}
+							}
+						);
+					} else {
+						form.reportValidity();
+					}
+				});
+			}
+			/**
+			 * Do nothing
+			 */
+		}
+
+		this.setUserAuctionBox = function(auction) {
+			if (auction.state === "OPEN") {
+				var p = addNode(this.stateOptionNode, "div", "place-offer");
+				p = addNode(p, "form", "form");
+				p.action = "#";
+				var label = addNode(p, "label", "form-label");
+				var hidden = addNode(p, "input", "");
+				var price = addNode(p, "input", "digit-input");
+				var submit = addNode(p, "input", "submit-input");
+				label.innerText = "Place Offer";
+				hidden.type = "hidden";
+				hidden.name = "auctionId";
+				hidden.value = auction.id;
+				price.type = "number";
+				price.name = "import";
+				submit.type = "button";
+				submit.value = "Offer";
+
+				var self = this;
+				console.log(this.offers);
+				/**
+				 * POST method to send new offer
+				 */
+				submit.addEventListener('click', (e) => {
+					var form = e.target.closest("form");
+					if (form.checkValidity()) {
+						makeCall("POST", 'confirm-offer', form,
+							function(x) {
+								if (x.readyState == XMLHttpRequest.DONE) {
+									var message = x.responseText;
+									switch (x.status) {
+										case 200:
+											// Reload this page
+											if (self.offers) self.getAuctionDetails(auction.id, true);
+											else self.getOwnerAuctionDetails(auction.id, true);
+											return;
+										case 400: // bad request
+										case 401: // unauthorized
+										case 500: // server error
+											errorMessageBanner.show(message);
+											break;
+									}
+								}
+							}
+						);
+					} else {
+						form.reportValidity();
+					}
+				});
+			}
+			/**
+			 * Else do nothing
+			 */
+		}
+
+		this.update = function(auction, userIsOwner) {
+			this.reset();
+			this.setHeader(auction);
+			this.setOffersBox(auction);
+
+			if (userIsOwner) this.setOwnerAuctionBox(auction);
+			else this.setUserAuctionBox(auction);
 
 			/**
-			 * Auction state depent box
+			 * Items grid
 			 */
-			console.log("Auction state: " + auction.state);
-			if (auction.state === "CLOSED") {
-				var p = addNode(self.stateOptionNode, "div", "item-container");
-				p.style.color = "white";
-				p = addNode(p, "div", "padding");
-				if (auction.winner) {
-					addNode(p, "h2", "", "The auction was won by: ");
-					addNode(p, "p", "", "Username: " + auction.winner.username);
-					addNode(p, "p", "", "Surname: " + auction.winner.surname);
-					addNode(p, "p", "", "Name: " + auction.winner.name);
-					addNode(p, "p", "", "Address: " + auction.winner.address);
-				} else {
-					addNode(p, "p", "", "No one offered for this auction");
-				}
-			} else {
-				/**
-				 * Check if the user is the owner of the auction
-				 */
-				if (auction.username === sessionStorage.getItem("username").trim()) {
-					if (auction.state === "EXPIRED") {
-						/**
-						 * Close auction form
-						 */
-						var p = addNode(self.stateOptionNode, "div", "place-offer");
-						p = addNode(p, "form", "form");
-						p.action = "#";
-						var hidden = addNode(p, "input", "");
-						var submit = addNode(p, "input", "submit-input");
-						hidden.type = "hidden";
-						hidden.name = "auctionId";
-						hidden.value = auction.id;
-						submit.type = "submit";
-						submit.value = "Close Auction";
-						/**
-						 * TODO: POST method to close
-						 */
-					}
-				} else {
-					if (auction.state === "OPEN") {
-						var p = addNode(self.stateOptionNode, "div", "place-offer");
-						p = addNode(p, "form", "form");
-						p.action = "#";
-						var label = addNode(p, "label", "form-label");
-						var hidden = addNode(p, "input", "");
-						var price = addNode(p, "input", "digit-input");
-						var submit = addNode(p, "input", "submit-input");
-						label.innerText = "Place Offer";
-						hidden.type = "hidden";
-						hidden.name = "auctionId";
-						hidden.value = auction.id;
-						price.type = "number";
-						price.name = "import";
-						submit.type = "button";
-						submit.value = "Offer";
-						/**
-						 * POST method to send new offer
-						 */
-						submit.addEventListener('click', (e) => {
-							var form = e.target.closest("form");
-							if (form.checkValidity()) {
-								makeCall("POST", 'confirm-offer', form,
-									function(x) {
-										if (x.readyState == XMLHttpRequest.DONE) {
-											var message = x.responseText;
-											switch (x.status) {
-												case 200:
-													// Reload this page
-													pageOrchestrator.seeAuctionDetails(auction.id);
-													return;
-												case 400: // bad request
-												case 401: // unauthorized
-												case 500: // server error
-													errorMessageBanner.show(message);
-													break;
-											}
-										}
-									}
-								);
-							} else {
-								form.reportValidity();
-							}
-						});
-					}
-
-
-				}
-				/**
-				 * Items grid
-				 */
-				self.itemsNumberNode.textContent = "There are " + auction.items.length + " items in this auction";
-				new ItemsGrid(auction.items, self.itemsNode).show();
-			}
+			this.itemsNumberNode.textContent = "There are " + auction.items.length + " items in this auction";
+			new ItemsGrid(auction.items, this.itemsNode).show();
 		}
 
 		this.constructOffer = function(offer) {

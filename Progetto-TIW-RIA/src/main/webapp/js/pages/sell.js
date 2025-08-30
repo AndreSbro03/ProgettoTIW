@@ -46,9 +46,9 @@
 			this.startingNode.style.display = "block";
 			this.title.innerText = "Sell";
 			this.greetings.innerText = "Welcome back " + sessionStorage.getItem("username");
-			new AuctionList(closed, this.closedAuctions).show();
+			new AuctionList(closed, this.closedAuctions, false).show();
 			this.caNumber.innerText = "You have " + closed.length + " closed auctions.";
-			new AuctionList(open, this.openAuctions).show();
+			new AuctionList(open, this.openAuctions, false).show();
 			this.oaNumber.innerText = "You have " + open.length + " open auctions.";
 			new ItemsGrid(items, this.itemsGrid).show();
 			this.iNumber.innerText = "Found " + items.length + " items not in auctions.";

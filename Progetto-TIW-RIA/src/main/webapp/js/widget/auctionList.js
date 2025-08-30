@@ -1,8 +1,9 @@
 {
 
-	function AuctionList(_auctions, _startingNode) {
+	function AuctionList(_auctions, _startingNode, _offersPage) {
 		this.startingNode = _startingNode;
 		this.auctions = _auctions;
+		this.offersPage = _offersPage;
 
 		function appendItemCard(startingNode, item) {
 			var ip = startingNode;
@@ -16,6 +17,7 @@
 		}
 
 		this.show = function() {
+			if(this.offersPage === undefined) throw new Error("Missing offersPage");
 			var self = this;
 			/// Clean the container
 			self.startingNode.innerHTML = "";
@@ -30,7 +32,7 @@
 				rr.addEventListener("click", (e) => {
 					// dependency via module parameter
 					console.log("Clicked on element with id: " + auction.id);
-					pageOrchestrator.seeAuctionDetails(auction.id);
+					pageOrchestrator.seeAuctionDetails(auction.id, self.offersPage);
 					//auctionDetails.show(e.target.getAttribute("auctionId")); // the list must know the details container
 				}, false);
 

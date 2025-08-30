@@ -162,7 +162,7 @@
 						<c:forEach var="item" items="${auction.items}" varStatus="row">
 							<div class="product-card">
 								<img
-									src="${pageContext.request.contextPath}/${ItemImage.getImageUrl(item.id)}"
+									src="images?itemId=${item.id}"
 									class="product-image" height="200px">
 								<div class="padding">
 									<h2 class="product-name">

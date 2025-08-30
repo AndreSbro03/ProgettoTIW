@@ -68,6 +68,10 @@ public class SingUp extends HttpServlet {
 			sendErrorMessage(req, res, "Passwords mismatch");
 			return;
 		}
+		
+		/**
+		 * TODO: check if username is already taken
+		 */
 
 		/**
 		 * Add user to the db

@@ -58,6 +58,8 @@ var pageOrchestrator;
 				starting: document.getElementById("buy-page"),
 				aNumber: document.getElementById("auction-number"),
 				auctions: document.getElementById("buy-auctions"),
+				wNumber: document.getElementById("won-auction-number"),
+				wonAuctions: document.getElementById("won-auctions"),
 				search: document.getElementById("buy-search-form")
 			}
 			);
@@ -125,9 +127,9 @@ var pageOrchestrator;
 			auctionForm.hide();
 		}
 
-		this.seeAuctionDetails = function(id) {
+		this.seeAuctionDetails = function(id, offerPage) {
 			this.reset();
-			auctionDetails.show(id);
+			auctionDetails.show(id, offerPage);
 
 		}
 

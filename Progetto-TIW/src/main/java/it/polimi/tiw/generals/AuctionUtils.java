@@ -1,5 +1,6 @@
 package it.polimi.tiw.generals;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,7 +9,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 public class AuctionUtils {
 	
@@ -56,5 +61,4 @@ public class AuctionUtils {
         return String.format("%d days, %d:%d:%d",
                 days, hours, minutes, seconds);
     }
-	
 }

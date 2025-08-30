@@ -89,7 +89,9 @@ public class Buy extends HttpServlet {
 		try {
 			won = ad.getAucitonWonBy(user.getUsername());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Server error");
+			return;
 		}
 		
 		res.setContentType("text/plain");

@@ -1,12 +1,5 @@
 package it.polimi.tiw.servlets;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,37 +9,40 @@ import it.polimi.tiw.beans.Auction;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.AuctionDAO;
 import it.polimi.tiw.generals.AuctionUtils;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class CloseAuction
  */
 @WebServlet("/close-auction")
+@MultipartConfig
 public class CloseAuction extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
-	
+
 	public void init() throws ServletException {
 		connection = AuctionUtils.openDbConnection(getServletContext());
 	}
-       
-	private void sendErrorMessage(HttpServletRequest req, HttpServletResponse res, String msg, int auctionId) throws IOException {
-		HttpSession session = req.getSession(true);
-		session.setAttribute("errorMsg", msg);
-		res.sendRedirect("auction-details?auctionId=" + auctionId);
-	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		
+
 		/**
 		 * First check if there is an user logged in. If not redirect to the login page.
 		 */
 		HttpSession session = req.getSession();
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
-			res.sendRedirect("login.jsp");
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			res.getWriter().println("You must be logged");
 			return;
 		}
-		
+
 		/**
 		 * Get all the parameters passed in the form
 		 */
@@ -55,10 +51,11 @@ public class CloseAuction extends HttpServlet {
 		try {
 			auctionId = Integer.parseInt(aId);
 		} catch (Exception e) {
-			sendErrorMessage(req, res, "Input not valid", 0);
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("Input not valid");
 			return;
 		}
-		
+
 		/**
 		 * Get auction data
 		 */
@@ -71,36 +68,40 @@ public class CloseAuction extends HttpServlet {
 			res.getWriter().println("Server error");
 			return;
 		}
-		
-		if(auction == null) {
-			sendErrorMessage(req, res, "No such auction", 0);
+
+		if (auction == null) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("No such auction");
 			return;
 		}
-		
+
 		/**
 		 * Check if the user is the owner of the auction
 		 */
-		if(!user.getUsername().equals(auction.getUsername())) {
-			sendErrorMessage(req, res, "This is not your auction", auction.getId());
+		if (!user.getUsername().equals(auction.getUsername())) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("This is not your auction");
 			return;
 		}
-		
+
 		/**
 		 * The auction must be expired
 		 */
-		if(!LocalDateTime.now().isAfter(auction.getDateTime())) {
-			sendErrorMessage(req, res, "The auction must be expired", auction.getId());
+		if (!LocalDateTime.now().isAfter(auction.getDateTime())) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("The auction must be expired");
 			return;
 		}
-		
+
 		/**
 		 * The auction must not be already closed
 		 */
-		if(auction.getFinished()) {
-			sendErrorMessage(req, res, "The auction is alredy closed", auction.getId());
+		if (auction.getFinished()) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			res.getWriter().println("The auction is alredy closed");
 			return;
 		}
-		
+
 		try {
 			adao.markAuctionAsFinished(auction.getId());
 		} catch (SQLException e) {
@@ -108,10 +109,13 @@ public class CloseAuction extends HttpServlet {
 			res.getWriter().println("Server error");
 			return;
 		}
-		
-		res.sendRedirect("auction-details?auctionId=" + auction.getId());
+
+		res.setStatus(HttpServletResponse.SC_OK);
+		res.getWriter().println("Auction closed successfully");
+		return;
+
 	}
-	
+
 	public void destroy() {
 		try {
 			if (connection != null) {
@@ -120,5 +124,4 @@ public class CloseAuction extends HttpServlet {
 		} catch (SQLException sqle) {
 		}
 	}
-
 }
