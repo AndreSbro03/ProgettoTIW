@@ -306,6 +306,14 @@ var pageOrchestrator;
 				 */
 				Promise.all(requests).then(results => {
 					var out = results.filter(a => a !== null);
+					out.sort((a, b) => {
+						var dateA = new Date(a.dateTime);
+						var dateB = new Date(b.dateTime);
+						// First the ones the newest
+						if(dateA < dateB) return 1; // a will be after b if b is older than a
+						if(dateA > dateB) return -1;
+						else return 0;
+					});
 					this.show("BUY", out);
 				});
 			}
