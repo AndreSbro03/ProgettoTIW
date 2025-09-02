@@ -94,7 +94,7 @@ public class GetAuctionDetails extends HttpServlet {
 				}
 			} else {
 				// Item not found
-				res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				res.getWriter().println("No auction with id:" + auctionId);
 				return;
 			}

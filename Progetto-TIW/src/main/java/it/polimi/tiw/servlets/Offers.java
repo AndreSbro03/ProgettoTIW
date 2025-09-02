@@ -86,18 +86,6 @@ public class Offers extends HttpServlet {
 					res.getWriter().println("Server error");
 					return;
 				}
-
-				/**
-				 * Check it the request if from the owner of the auction
-				 */
-				HttpSession session = req.getSession();
-				User user = (User) session.getAttribute("user");
-				if (user != null && user.getUsername().equals(auction.getUsername())) {
-					/**
-					 * Yes the user is the owner
-					 */
-					req.setAttribute("isUserOwner", true);
-				}
 			}
 		}
 

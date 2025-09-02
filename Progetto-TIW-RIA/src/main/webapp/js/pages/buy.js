@@ -7,20 +7,32 @@
 		this.startingNode = nodes["starting"];
 		this.numberNode = nodes["aNumber"];
 		this.auctionsNode = nodes["auctions"];
-		this.searchForm = nodes["search"];
 		this.wonNumberNode = nodes["wNumber"];
 		this.wonAuctionsNode = nodes["wonAuctions"]
+		this.init = false;
+
+		this.search = function(word) {
+			console.log("Searching: " + word);
+			this.getAuctions(word);
+		}
 
 
-		this.show = function(word) {
-			const self = this;
+		/**
+		 * If some auctions are provided than don't call getAuctions
+		 */
+		this.show = function(auctions) {
 			this.startingNode.style.display = "block";
 			/**
 			 * Title
 			 */
-			self.title.textContent = "Buy";
-			this.getAuctions();
-			this.getWonAuctions(word);
+			this.title.textContent = "Buy";
+			this.getWonAuctions();
+
+			if (!this.init) {
+				if (auctions === undefined) this.getAuctions();
+				else this.updateAuctions(auctions)
+				this.init = true;
+			}
 		}
 
 		this.getAuctions = function(word) {
@@ -71,6 +83,7 @@
 		}
 
 		this.updateAuctions = function(auctions) {
+			this.auctionsNode.innerHTML = "";
 			const self = this;
 			/**
 			 * Auction number
@@ -84,18 +97,10 @@
 				new AuctionList(auctions, self.auctionsNode, true).show();
 			}
 
-			/**
-			 * Search Button
-			 */
-			this.searchForm.addEventListener("click", (e) => {
-				e.preventDefault();
-				var keyword = new FormData(this.searchForm).get("key-word");
-				this.getAuctions(keyword)
-			})
-
 		}
 
 		this.updateWonAuctions = function(auctions) {
+			this.wonAuctionsNode.innerHMTL = "";
 			/**
 			 * Auction number
 			 */
@@ -111,7 +116,7 @@
 
 		this.reset = function() {
 			this.auctionsNode.innerHTML = "";
-			this.wonAuctionsNode = "";
+			this.wonAuctionsNode.innerHMTL = "";
 		}
 
 		this.hide = function() {

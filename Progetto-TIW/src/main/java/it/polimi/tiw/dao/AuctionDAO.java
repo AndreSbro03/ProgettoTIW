@@ -280,7 +280,7 @@ public class AuctionDAO {
 		
 	}
 	
-	public ArrayList<Auction> getAucitonWonBy(String username) throws SQLException{
+	public ArrayList<Auction> getAuctionsWonBy(String username) throws SQLException{
 		String query = "SELECT a.auctionID, a.init_price, a.min_incr, a.expiration, a.finished, "
 				+ "						u1.userID AS vendorID, u1.username AS vendor_username, "
 				+ "				        i.itemID, i.price AS item_price, i.name AS item_name, i.descr AS item_descr, "

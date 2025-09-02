@@ -23,7 +23,6 @@
 			self.startingNode.innerHTML = "";
 			/// Iter the auctions
 			self.auctions.forEach(function(auction) {
-				console.log(auction);
 				var rr = addNode(self.startingNode, "div", "rounded-rectangle");
 
 				/**

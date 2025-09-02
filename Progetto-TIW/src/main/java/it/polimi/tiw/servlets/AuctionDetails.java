@@ -62,6 +62,19 @@ public class AuctionDetails extends HttpServlet {
 			}
 
 			if (auction != null) {
+				
+				/**
+				 * Check it the request if from the owner of the auction
+				 */
+				HttpSession session = req.getSession();
+				User user = (User) session.getAttribute("user");
+				if (user == null || !user.getUsername().equals(auction.getUsername())) {
+					/**
+					 * User is not the owner of the auction
+					 */
+					res.sendRedirect("login.jsp");
+					return;
+				}
 
 				/**
 				 * The auction is finished
@@ -95,19 +108,6 @@ public class AuctionDetails extends HttpServlet {
 				} catch (SQLException e) {
 					res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					res.getWriter().println("Server error");
-					return;
-				}
-
-				/**
-				 * Check it the request if from the owner of the auction
-				 */
-				HttpSession session = req.getSession();
-				User user = (User) session.getAttribute("user");
-				if (user == null || !user.getUsername().equals(auction.getUsername())) {
-					/**
-					 * User is not the owner of the auction
-					 */
-					res.sendRedirect("login.jsp");
 					return;
 				}
 			}

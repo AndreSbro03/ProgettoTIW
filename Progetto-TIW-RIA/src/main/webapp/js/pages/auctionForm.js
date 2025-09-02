@@ -57,6 +57,8 @@
 								var message = x.responseText;
 								switch (x.status) {
 									case 200:
+										// Notify pageOrchestrator
+										pageOrchestrator.saveState("CREATE-AUCTION");
 										pageOrchestrator.show("SELL");
 										return;
 									case 401: // unauthorized

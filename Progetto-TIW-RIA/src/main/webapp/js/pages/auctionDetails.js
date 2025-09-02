@@ -165,9 +165,11 @@
 									var message = x.responseText;
 									switch (x.status) {
 										case 200:
+											// Notify the pageOrchestrator
+											pageOrchestrator.saveState("CLOSE-AUCTION")
+										
 											// Reload this page
-											if (self.offers) self.getAuctionDetails(auction.id, true);
-											else self.getOwnerAuctionDetails(auction.id, true);
+											self.show(auction.id, false);
 											return;
 										case 401: // unauthorized
 											window.location.href = "index.html";
@@ -222,9 +224,11 @@
 									var message = x.responseText;
 									switch (x.status) {
 										case 200:
-											// Reload this page
-											if (self.offers) self.getAuctionDetails(auction.id, true);
-											else self.getOwnerAuctionDetails(auction.id, true);
+											// Notify pageOrchestrator
+											pageOrchestrator.saveState("OFFER")
+										
+											// Reload this page (it's of course an offers page)
+											self.show(auction.id, true);
 											return;
 										case 400: // bad request
 										case 401: // unauthorized

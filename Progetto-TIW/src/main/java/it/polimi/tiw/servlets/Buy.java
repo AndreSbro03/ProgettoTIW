@@ -87,7 +87,7 @@ public class Buy extends HttpServlet {
 		 */
 		ArrayList<Auction> won = null;
 		try {
-			won = ad.getAucitonWonBy(user.getUsername());
+			won = ad.getAuctionsWonBy(user.getUsername());
 		} catch (SQLException e) {
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			res.getWriter().println("Server error");

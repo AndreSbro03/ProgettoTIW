@@ -132,7 +132,7 @@ public class ConfirmOffer extends HttpServlet {
 			return;
 		}
 		
-		res.sendRedirect("auction-details?auctionId="+aId);
+		res.sendRedirect("offers?auctionId="+aId);
 		
 	}
 	
