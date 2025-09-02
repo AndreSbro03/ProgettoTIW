@@ -161,13 +161,16 @@
 					<div class="product-grid">
 						<c:forEach var="item" items="${auction.items}" varStatus="row">
 							<div class="product-card">
-								<img
-									src="images?itemId=${item.id}"
-									class="product-image" height="200px">
+								<img src="images?itemId=${item.id}" class="product-image"
+									height="200px">
 								<div class="padding">
 									<h2 class="product-name">
 										<c:out value="${item.name}" />
 									</h2>
+									<p class="product-description">
+										id:
+										<c:out value="${item.id}" />
+									</p>
 									<p class="product-description">
 										<c:out value="${item.descr}" />
 									</p>

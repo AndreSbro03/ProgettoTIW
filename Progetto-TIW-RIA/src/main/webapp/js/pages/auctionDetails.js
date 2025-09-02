@@ -28,6 +28,9 @@
 			else this.getOwnerAuctionDetails(id);
 		}
 
+		/**
+		 * Equivalent to AuctionDetails in pure HTML
+		 */
 		this.getOwnerAuctionDetails = function(id, reload = false) {
 			makeCall("GET", "get-user-auction?auctionId=" + id, null, (x) => {
 				if (x.readyState == XMLHttpRequest.DONE) {
@@ -49,6 +52,9 @@
 			}, true)
 		}
 
+		/**
+		 * Equivalent to Offers in pure HTML
+		 */
 		this.getAuctionDetails = function(id, reload = false) {
 			makeCall("GET", "get-auction-details?auctionId=" + id, null, (x) => {
 				if (x.readyState == XMLHttpRequest.DONE) {
@@ -167,7 +173,7 @@
 										case 200:
 											// Notify the pageOrchestrator
 											pageOrchestrator.saveState("CLOSE-AUCTION")
-										
+
 											// Reload this page
 											self.show(auction.id, false);
 											return;
@@ -226,7 +232,7 @@
 										case 200:
 											// Notify pageOrchestrator
 											pageOrchestrator.saveState("OFFER")
-										
+
 											// Reload this page (it's of course an offers page)
 											self.show(auction.id, true);
 											return;

@@ -84,6 +84,9 @@
 									<c:out value="${item.name}" />
 								</h2>
 								<p class="product-description">
+									id: <c:out value="${item.id}" />
+								</p>
+								<p class="product-description">
 									<c:out value="${item.descr}" />
 								</p>
 							</div>
@@ -133,6 +136,9 @@
 								<h2 class="product-name">
 									<c:out value="${item.name}" />
 								</h2>
+								<p class="product-description">
+									id: <c:out value="${item.id}" />
+								</p>
 								<p class="product-description">
 									<c:out value="${item.descr}" />
 								</p>

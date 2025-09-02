@@ -13,6 +13,7 @@
 			image.src = "images?itemId=" + item.id;
 			ip = addNode(ip, "div", "padding");
 			addNode(ip, "h2", "product-name", item.name);
+			addNode(ip, "p", "product-description", "id: " + item.id);
 			addNode(ip, "p", "product-description", item.descr);
 		}
 
