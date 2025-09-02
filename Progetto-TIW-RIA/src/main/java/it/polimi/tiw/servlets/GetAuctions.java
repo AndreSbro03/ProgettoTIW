@@ -6,7 +6,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -20,7 +19,6 @@ import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.beans.Auction;
 import it.polimi.tiw.beans.Item;
-import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.AuctionDAO;
 import it.polimi.tiw.generals.AuctionUtils;
 import it.polimi.tiw.generals.LocalDateTimeAdapter;

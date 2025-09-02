@@ -12,13 +12,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import it.polimi.tiw.beans.Auction;
-import it.polimi.tiw.beans.Item;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.AuctionDAO;
 import it.polimi.tiw.generals.AuctionUtils;

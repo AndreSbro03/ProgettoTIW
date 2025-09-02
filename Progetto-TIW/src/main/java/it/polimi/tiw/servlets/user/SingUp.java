@@ -68,10 +68,6 @@ public class SingUp extends HttpServlet {
 			sendErrorMessage(req, res, "Passwords mismatch");
 			return;
 		}
-		
-		/**
-		 * TODO: check if username is already taken
-		 */
 
 		/**
 		 * Add user to the db
@@ -79,6 +75,10 @@ public class SingUp extends HttpServlet {
 		UserDataDAO udd = new UserDataDAO(connection);
 		int uId = 0;
 		try {
+			if(udd.isUsernameAlreadyTaken(username)) {
+				sendErrorMessage(req, res, "Username already taken");
+				return;
+			}
 			uId = udd.addUser(username, password, name, surname, address);
 		} catch (SQLException e) {
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -134,7 +134,6 @@ public class GetUserAuction extends HttpServlet {
 
 		/**
 		 * Return the auction as json.
-		 * TODO: check the behavior in case the auction is not found;
 		 */
 		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 		String json = gson.toJson(auction);

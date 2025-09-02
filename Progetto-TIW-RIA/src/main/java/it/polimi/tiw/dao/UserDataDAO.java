@@ -14,6 +14,38 @@ public class UserDataDAO {
 	public UserDataDAO(Connection connection) {
 		this.connection = connection;
 	}
+	
+	public boolean isUsernameAlreadyTaken(String username) throws SQLException {
+		String query = "SELECT userID FROM user WHERE username = ?;";
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		boolean out = false;
+		try {
+
+			statement = connection.prepareStatement(query);
+			statement.setString(1, username);
+			rs = statement.executeQuery();
+
+			if (rs.next()) {
+				out = true;
+			}
+
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			try {
+				if (statement != null)
+					statement.close();
+				if (rs != null)
+					rs.close();
+			} catch (Exception e1) {
+				throw e1;
+			}
+		}
+
+		return out;
+		
+	}
 
 	public int addUser(String username, String password, String name, String surname, String address)
 			throws SQLException {

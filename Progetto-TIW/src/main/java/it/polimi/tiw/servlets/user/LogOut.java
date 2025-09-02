@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-import it.polimi.tiw.beans.User;
-
 /**
  * Servlet implementation class LogOut
  */

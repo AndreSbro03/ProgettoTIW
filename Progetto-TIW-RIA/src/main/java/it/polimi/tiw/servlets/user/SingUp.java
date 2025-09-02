@@ -6,7 +6,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.*;
@@ -78,6 +77,11 @@ public class SingUp extends HttpServlet {
 		UserDataDAO udd = new UserDataDAO(connection);
 		int uId = 0;
 		try {
+			if(udd.isUsernameAlreadyTaken(username)) {
+				res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				res.getWriter().println("Username already taken");
+				return;
+			}
 			uId = udd.addUser(username, password, name, surname, address);
 		} catch (SQLException e) {
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
