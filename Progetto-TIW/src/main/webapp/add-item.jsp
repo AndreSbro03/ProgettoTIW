@@ -29,7 +29,7 @@
 				for="image">Image</label> <input class="file-input" type="file"
 				name="image" accept="image/*"> <label class="form-label"
 				for="price">Price</label> <input class="digit-input" type="number"
-				name="price" placeholder="Price"> <input
+				name="price" placeholder="Price" step="0.01"> <input
 				class="submit-input" type="submit" value="Add">
 		</form>
 	</div>
