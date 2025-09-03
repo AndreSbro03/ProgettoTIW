@@ -76,7 +76,7 @@ public class ItemDAO {
 			 */
 			rs = ps.executeQuery();
 			if (rs.next())
-				out = rs.getInt("tot");
+				out = rs.getFloat("tot");
 
 		} catch (SQLException e) {
 			throw e;

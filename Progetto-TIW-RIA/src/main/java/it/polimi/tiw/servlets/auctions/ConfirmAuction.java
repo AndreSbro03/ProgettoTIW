@@ -47,7 +47,7 @@ public class ConfirmAuction extends HttpServlet {
 		String date = req.getParameter("date");
 		String time = req.getParameter("time");
 		
-		if (ids == null || min_increment == null || date == null || time == null) {
+		if (ids == null || min_increment == null || date == null || time == null || min_increment.isEmpty() || date.isEmpty() || time.isEmpty() || ids.length == 0) {
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			res.getWriter().println("Fill all fields");
 			return;

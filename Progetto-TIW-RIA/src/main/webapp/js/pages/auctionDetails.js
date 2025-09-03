@@ -165,6 +165,10 @@
 					console.log("Closing auction: " + auction.id);
 					var form = e.target.closest("form");
 					if (form.checkValidity()) {
+						if (auction.username !== sessionStorage.getItem("username")) {
+							errorMessageBanner.show("Can't offer on your own auction");
+							return;
+						}
 						makeCall("POST", "close-auction", form,
 							function(x) {
 								if (x.readyState == XMLHttpRequest.DONE) {
@@ -211,8 +215,17 @@
 				hidden.type = "hidden";
 				hidden.name = "auctionId";
 				hidden.value = auction.id;
+
 				price.type = "number";
 				price.name = "import";
+				price.step = 0.01;
+				price.required = true;
+				var currPrice = (auction.lstOffer) ? auction.lstOffer.price : auction.initPrice;
+				var minOffer = currPrice + auction.minIncr;
+				price.min = minOffer;
+				price.placeholder = minOffer + "€";
+				price.value = minOffer;
+
 				submit.type = "button";
 				submit.value = "Offer";
 
@@ -224,6 +237,13 @@
 				submit.addEventListener('click', (e) => {
 					var form = e.target.closest("form");
 					if (form.checkValidity()) {
+						/**
+						 * Tecnicaly this check is usless beacause it's already done on the GET function
+						 */
+						if (auction.username === sessionStorage.getItem("username").trim()) {
+							errorMessageBanner.show("js: Can't offer on your own auction");
+							return;
+						}
 						makeCall("POST", 'confirm-offer', form,
 							function(x) {
 								if (x.readyState == XMLHttpRequest.DONE) {

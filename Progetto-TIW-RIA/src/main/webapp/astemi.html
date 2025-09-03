@@ -166,21 +166,21 @@
 			<div id="auction-items" class="product-grid"></div>
 		</div>
 	</div>
-	
-	
+
+
 	<div id="add-item-form">
 		<div class="padding">
 			<form class="form" action="#" enctype="multipart/form-data">
 				<label class="form-label" for="name">Name</label> <input
-					class="digit-input" type="text" name="name" placeholder="Name">
-
-				<label class="form-label" for="description">Description</label> <input
-					class="digit-input" type="text" name="description"
-					placeholder="Description" required> <label class="form-label"
-					for="image">Image</label> <input class="file-input" type="file"
-					name="image" accept="image/*" required> <label class="form-label"
-					for="price">Price</label> <input class="digit-input" type="number"
-					name="price" placeholder="Price" min="0" step="0.01" required> <input
+					class="digit-input" type="text" name="name" placeholder="Name"
+					minlength="4" maxlength="64" required> <label class="form-label"
+					for="description">Description</label> <input class="digit-input"
+					type="text" name="description" placeholder="Description" minlength="0" maxlength="256" required>
+				<label class="form-label" for="image">Image</label> <input
+					class="file-input" type="file" name="image" accept="image/*"
+					required> <label class="form-label" for="price">Price</label>
+				<input class="digit-input" type="number" name="price"
+					placeholder="Price" min="0" step="0.01" required> <input
 					id="item-form-submit" class="submit-input" type="button"
 					value="Add">
 			</form>
@@ -194,12 +194,13 @@
 
 				<label class="form-label" for="min_incr">Minimum offer
 					increment</label> <input class="digit-input" type="number" name="min_incr"
-					placeholder="Minimum offer increment" required> <label
+					placeholder="Minimum offer increment" min="1" placeholder="1€" required> <label
 					class="form-label" for="expiration">Expiration</label> <input
-					class="digit-input" type="date" name="date" placeholder="Date" required>
-				<input class="digit-input" type="time" name="time"
-					placeholder="Time" required> <input id="auction-form-submit"
-					class="submit-input" type="button" value="Add">
+					class="digit-input" type="date" name="date" placeholder="Date"
+					required> <input class="digit-input" type="time"
+					name="time" placeholder="Time" required> <input
+					id="auction-form-submit" class="submit-input" type="button"
+					value="Add">
 			</form>
 		</div>
 	</div>
