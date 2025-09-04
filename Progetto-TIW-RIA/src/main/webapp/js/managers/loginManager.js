@@ -31,6 +31,6 @@
 		} else {
 			form.reportValidity();
 		}
-	});
+	}, false);
 
 })();

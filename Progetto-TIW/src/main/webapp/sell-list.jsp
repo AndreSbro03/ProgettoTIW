@@ -25,7 +25,7 @@
 			<a href="homepage.html" class="btn">Home</a>
 		</div>
 	</div>
-	
+
 	<div class="absolute-top-right">
 		<div class="padding">
 			<a href="log-out" class="btn">LogOut</a>
@@ -76,15 +76,15 @@
 
 						<!-- Items card -->
 						<div class="product-card">
-							<img
-								src="images?itemId=${item.id}"
-								class="product-image" height="150px">
+							<img src="images?itemId=${item.id}" class="product-image"
+								height="150px">
 							<div class="padding">
 								<h2 class="product-name">
 									<c:out value="${item.name}" />
 								</h2>
 								<p class="product-description">
-									id: <c:out value="${item.id}" />
+									id:
+									<c:out value="${item.id}" />
 								</p>
 								<p class="product-description">
 									<c:out value="${item.descr}" />
@@ -129,15 +129,15 @@
 
 						<!-- Items card -->
 						<div class="product-card">
-							<img
-								src="images?itemId=${item.id}"
-								class="product-image" height="150px">
+							<img src="images?itemId=${item.id}" class="product-image"
+								height="150px">
 							<div class="padding">
 								<h2 class="product-name">
 									<c:out value="${item.name}" />
 								</h2>
 								<p class="product-description">
-									id: <c:out value="${item.id}" />
+									id:
+									<c:out value="${item.id}" />
 								</p>
 								<p class="product-description">
 									<c:out value="${item.descr}" />
@@ -154,32 +154,30 @@
 
 	<div class="centered">
 		<div class="padding">
-			<p class="light-text">Found ${items.size()} items not in auctions.</p>
+			<p class="light-text">Found ${items.size()} items not in
+				auctions.</p>
 		</div>
 	</div>
 
-	<div class="centered">
-		<div class="product-grid">
-			<c:forEach var="item" items="${items}" varStatus="row">
-				<div class="product-card">
-					<img
-						src="images?itemId=${item.id}"
-						class="product-image" height="200px">
-					<div class="padding">
-						<h2 class="product-name">
-							<c:out value="${item.name}" />
-						</h2>
-						<p class="product-description">
-							<c:out value="${item.descr}" />
-						</p>
-						<p class="product-description">
-							<c:out value="${item.price}" />
-							€
-						</p>
-					</div>
+	<div class="product-grid">
+		<c:forEach var="item" items="${items}" varStatus="row">
+			<div class="product-card">
+				<img src="images?itemId=${item.id}" class="product-image"
+					height="200px">
+				<div class="padding">
+					<h2 class="product-name">
+						<c:out value="${item.name}" />
+					</h2>
+					<p class="product-description">
+						<c:out value="${item.descr}" />
+					</p>
+					<p class="product-description">
+						<c:out value="${item.price}" />
+						€
+					</p>
 				</div>
-			</c:forEach>
-		</div>
+			</div>
+		</c:forEach>
 	</div>
 
 </body>

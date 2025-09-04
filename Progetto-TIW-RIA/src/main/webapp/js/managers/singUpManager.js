@@ -27,6 +27,6 @@
 		} else {
 			form.reportValidity();
 		}
-	});
+	}, false);
 
 })();

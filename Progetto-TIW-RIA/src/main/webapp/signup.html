@@ -30,19 +30,19 @@
 		<form class="form" action="singup" method="POST">
 			<label class="form-label" for="name">Name</label> <input
 				class="digit-input" type="text" name="name" placeholder="Name"
-				required> <label class="form-label" for="surname">Surname</label>
+				minlength="1" maxlength="32" required> <label class="form-label" for="surname">Surname</label>
 			<input class="digit-input" type="text" name="surname"
-				placeholder="Surname" required> <label class="form-label"
+				placeholder="Surname" minlength="1" maxlength="32" required> <label class="form-label"
 				for="address">Address</label> <input class="digit-input" type="text"
-				name="address" placeholder="Address" minlength="4"> <label
+				name="address" placeholder="Address" minlength="4" maxlength="256" required> <label
 				class="form-label" for="username">Username</label> <input
 				class="digit-input" type="text" name="username"
-				placeholder="Username" minlength="4"> <label
+				placeholder="Username" minlength="4" maxlength="256" required> <label
 				class="form-label" for="password">Password</label> <input
 				class="digit-input" type="password" name="password"
-				placeholder="Password" minlength="4"> <input
+				placeholder="Password" minlength="4" maxlength="32" required> <input
 				class="digit-input" type="password" name="confirm-pw"
-				placeholder="Repeat password" minlength="4"> <input
+				placeholder="Repeat password" minlength="1" maxlength="32" required> <input
 				id="singup-button" class="submit-input" type="button" value="LogIn">
 		</form>
 	</div>
