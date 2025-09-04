@@ -255,7 +255,7 @@ var pageOrchestrator;
 				this.show("BUY");
 				buy.search();
 			}
-			else if (lastAction === "CREATE_AUCTION") {
+			else if (lastAction === "CREATE-AUCTION") {
 				this.show("SELL");
 			}
 			else {
